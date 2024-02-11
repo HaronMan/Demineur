@@ -1,10 +1,12 @@
 package fr.haronman.demineur.model.Plateau.Case;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import javafx.scene.image.Image;
 
 public abstract class Case implements Serializable{
+    @Serial
     private static final long serialVersionUID = 1L;
     private boolean decouvert;
     private boolean drapeau;
@@ -53,7 +55,7 @@ public abstract class Case implements Serializable{
     public Image getImage() {
         if(!decouvert){
             if(drapeau){
-                return new Image("img/box/hidden_flag.png");
+                return new Image("img/flag/hidden_flag.png");
             }
             return new Image("img/box/hidden.png");
         }
@@ -66,11 +68,5 @@ public abstract class Case implements Serializable{
 
     public void setImage(Image image) {
         this.image = image;
-    }
-
-    @Override
-    public String toString() {
-        // TODO Auto-generated method stub
-        return super.toString();
     }
 }

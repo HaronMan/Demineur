@@ -22,7 +22,6 @@ public class Plateau implements Serializable {
         emplacementsMines = new ArrayList<Integer[]>(); 
         emplacementsDrapeaux = new ArrayList<Integer[]>(); 
         initTerrains();
-        placerMines();
     }
 
     public Case getCase(int row, int column) {
@@ -37,13 +36,13 @@ public class Plateau implements Serializable {
         }
     }
 
-    public void placerMines(){
+    public void placerMines(Case c){
         Random r = new Random();
         int cpt_bombes = 0;
         while(cpt_bombes < nbrBombe){
             int x = r.nextInt(matrice.length);
             int y = r.nextInt(matrice[0].length);
-            if(! (matrice[x][y] instanceof Mine)){
+            if( !(matrice[x][y] instanceof Mine) && matrice[x][y] != c){
                 matrice[x][y] = new Mine(x, y);
                 emplacementsMines.add(new Integer[]{x, y});
                 cpt_bombes++;

@@ -14,6 +14,10 @@ public class Mine extends Case{
         setImage(new Image("img/box/mine_clicked.png"));
     }
 
+    public void bonne_mine(){
+        setImage(new Image("img/flag/flag_correct.png"));
+    }
+
     @Override
     public String toString() {
         return "M";

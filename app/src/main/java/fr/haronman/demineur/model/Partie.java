@@ -44,7 +44,9 @@ public class Partie {
         for(Integer[] pos : plateau.getEmplacementsMines()){
             Mine m = (Mine) plateau.getCase(pos[0], pos[1]);
             if(!m.getDrapeau()){
-                plateau.getCase(pos[0], pos[1]).decouvrir();
+                m.decouvrir();
+            }else{
+                m.bonne_mine();
             }
             removeEmplacementsDrapeaux(pos);
         }

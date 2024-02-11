@@ -56,7 +56,7 @@ public class JeuFX {
         this.nbrDrapeauFX = new Label();
         nbrDrapeauFX.setFont(Font.font(20));
         this.visage = new ImageView(Visage.IDLE.getImage());
-        this.timerFX = new Label("0h 0m 0s");
+        this.timerFX = new Label();
         timerFX.setFont(Font.font(20));
         secondes = 0;
         initTimer();
@@ -302,40 +302,13 @@ public class JeuFX {
                             //Lancement du minuteur
                             if(jeu.getPartie().getPremierClic()){
                                 jeu.getPartie().premierClicEffectue();
+                                jeu.getPartie().getPlateau().placerMines(c);
                                 timeline.play();
                             }
                             // Si on souhaite la découvrir
                             if(!c.getDecouvert() && !c.getDrapeau()){
                                 // Condtions : caché et pas de drapeau
-                                if(c instanceof Mine m){
-                                    // Si cliqué sur une mine
-                                    m.touchee();
-                                    try {
-                                        updateVisage(Visage.LOSE);
-                                        defaite(m);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                }else if(c instanceof Terrain t){
-                                    jeu.getPartie().getPlateau().calculerBombesProches(t);
-                                    System.out.println(jeu.getPartie().getPlateau());
-                                    t.updateImage();
-                                    t.decouvrir();
-                                    jeu.getPartie().retirerCaseRestante();
-                                    
-                                    if(jeu.getPartie().getCasesRestantes() == 0){
-                                        try {
-                                            updateVisage(Visage.WIN);
-                                            victoire();
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                    
-                                    if(t.getBombesProches() == 0){
-                                        decouvrirZoneSure(t);
-                                    }
-                                }
+                                devoiler(c);
                                 iv.setImage(c.getImage());
                             }
                         }else{
@@ -347,21 +320,7 @@ public class JeuFX {
                     if(event.getButton() == MouseButton.SECONDARY) {
                         // Si on souhaite manipuler les drapeaux
                         if(!c.getDecouvert()){
-                            if(!c.getDrapeau()){
-                                // Placer un drapeau
-                                if(jeu.getPartie().getNbrDrapeaux() > 0){
-                                    // Si il reste au moins un drapeau en stock
-                                    c.insererDrapeau();
-                                    jeu.getPartie().retirerDrapeaux();
-                                    jeu.getPartie().addEmplacementsDrapeaux(new Integer[]{c.getRow(), c.getColumn()});
-                                }
-                            }else{
-                                // Retirer un drapeau
-                                c.retirerDrapeau();
-                                jeu.getPartie().removeEmplacementsDrapeaux(new Integer[]{c.getRow(), c.getColumn()});
-                                jeu.getPartie().ajouterDrapeaux();
-                            }
-                            updateDrapeauxFX();
+                            placerDrapeau(c);
                             iv.setImage(c.getImage());
                         }
                     }
@@ -376,6 +335,59 @@ public class JeuFX {
         return lignes;
     }
 
+    public void devoiler(Case c){
+        Case matCase = jeu.getPartie().getCaseMatrice(c.getRow(), c.getColumn());
+
+        if(matCase instanceof Mine m){
+            // Si cliqué sur une mine
+            m.touchee();
+            try {
+                updateVisage(Visage.LOSE);
+                defaite(m);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else if(matCase instanceof Terrain t){
+            jeu.getPartie().getPlateau().calculerBombesProches(t);
+            t.updateImage();
+            t.decouvrir();
+            jeu.getPartie().retirerCaseRestante();
+            
+            if(jeu.getPartie().getCasesRestantes() == 0){
+                try {
+                    updateVisage(Visage.WIN);
+                    victoire();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            
+            if(t.getBombesProches() == 0){
+                decouvrirZoneSure(t);
+            }
+        }
+    }
+
+    public void placerDrapeau(Case c){
+        Case matCase = jeu.getPartie().getCaseMatrice(c.getRow(), c.getColumn());
+
+        if(!matCase.getDrapeau()){
+            // Placer un drapeau
+            if(jeu.getPartie().getNbrDrapeaux() > 0){
+                // Si il reste au moins un drapeau en stock
+                matCase.insererDrapeau();
+                jeu.getPartie().retirerDrapeaux();
+                jeu.getPartie().addEmplacementsDrapeaux(new Integer[]{matCase.getRow(), matCase.getColumn()});
+            }
+        }else{
+            // Retirer un drapeau
+            matCase.retirerDrapeau();
+            jeu.getPartie().removeEmplacementsDrapeaux(new Integer[]{matCase.getRow(), matCase.getColumn()});
+            jeu.getPartie().ajouterDrapeaux();
+        }
+        updateDrapeauxFX();
+    }
+
     public void decouvrirZoneSure(Terrain t){
         Case[][] mat = jeu.getPartie().getMatricePlateau();
 
@@ -388,6 +400,11 @@ public class JeuFX {
                             Terrain newTerrain = (Terrain) mat[i][j];
                             
                             if(!newTerrain.getDecouvert()){
+                                if(newTerrain.getDrapeau()){
+                                    newTerrain.retirerDrapeau();
+                                    jeu.getPartie().removeEmplacementsDrapeaux(new Integer[]{newTerrain.getRow(), newTerrain.getColumn()});
+                                    jeu.getPartie().ajouterDrapeaux();
+                                }
                                 jeu.getPartie().getPlateau().calculerBombesProches(newTerrain);
                                 newTerrain.updateImage();
                                 newTerrain.decouvrir();

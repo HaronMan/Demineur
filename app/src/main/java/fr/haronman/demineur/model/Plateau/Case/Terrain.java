@@ -24,7 +24,7 @@ public class Terrain extends Case{
 
     public void fausse_mine() {
         decouvrir();
-        setImage(new Image("img/box/mine_incorrect.png"));
+        setImage(new Image("img/flag/flag_incorrect.png"));
     }
 
     @Override
