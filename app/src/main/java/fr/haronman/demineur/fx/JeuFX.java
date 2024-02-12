@@ -317,6 +317,12 @@ public class JeuFX {
                     }
                 });
                 bp.setOnMouseClicked(event -> {
+                    if(jeu.getPartie().getPremierClic()){
+                        jeu.getPartie().premierClicEffectue();
+                        jeu.getPartie().getPlateau().placerMines(c);
+                        timeline.play();
+                    }
+
                     if(event.getButton() == MouseButton.SECONDARY) {
                         // Si on souhaite manipuler les drapeaux
                         if(!c.getDecouvert()){
@@ -337,7 +343,6 @@ public class JeuFX {
 
     public void devoiler(Case c){
         Case matCase = jeu.getPartie().getCaseMatrice(c.getRow(), c.getColumn());
-
         if(matCase instanceof Mine m){
             // Si cliqué sur une mine
             m.touchee();
@@ -370,7 +375,6 @@ public class JeuFX {
 
     public void placerDrapeau(Case c){
         Case matCase = jeu.getPartie().getCaseMatrice(c.getRow(), c.getColumn());
-
         if(!matCase.getDrapeau()){
             // Placer un drapeau
             if(jeu.getPartie().getNbrDrapeaux() > 0){
@@ -382,9 +386,11 @@ public class JeuFX {
         }else{
             // Retirer un drapeau
             matCase.retirerDrapeau();
+            System.out.println("Case : "+matCase);
             jeu.getPartie().removeEmplacementsDrapeaux(new Integer[]{matCase.getRow(), matCase.getColumn()});
             jeu.getPartie().ajouterDrapeaux();
         }
+        System.out.println(matCase.getDrapeau());
         updateDrapeauxFX();
     }
 

@@ -5,5 +5,17 @@
         "titleBar.activeForeground": "#F2FDF9"
     },
     "java.compile.nullAnalysis.mode": "automatic",
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "local",
+            "database": "postgres",
+            "username": "postgres",
+            "password": "1234"
+        }
+    ]
 }

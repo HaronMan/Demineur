@@ -26,9 +26,4 @@ public class Terrain extends Case{
         decouvrir();
         setImage(new Image("img/flag/flag_incorrect.png"));
     }
-
-    @Override
-    public String toString() {
-        return String.valueOf(bombesProches);
-    }
 }
