@@ -32,6 +32,11 @@ public class Partie {
         return plateau.getCase(row, column);
     }
 
+    public void setCaseMatrice(Case c){
+        int row = c.getRow(), column = c.getColumn();
+        plateau.getMatrice()[row][column] = c;
+    }
+
     public void addEmplacementsDrapeaux(Integer[] pos){
         plateau.getEmplacementsDrapeaux().add(pos);
     }

@@ -326,8 +326,7 @@ public class JeuFX {
                     if(event.getButton() == MouseButton.SECONDARY) {
                         // Si on souhaite manipuler les drapeaux
                         if(!c.getDecouvert()){
-                            placerDrapeau(c);
-                            iv.setImage(c.getImage());
+                            iv.setImage(placerDrapeau(c).getImage());
                         }
                     }
                 });
@@ -373,7 +372,7 @@ public class JeuFX {
         }
     }
 
-    public void placerDrapeau(Case c){
+    public Case placerDrapeau(Case c){
         Case matCase = jeu.getPartie().getCaseMatrice(c.getRow(), c.getColumn());
         if(!matCase.getDrapeau()){
             // Placer un drapeau
@@ -390,8 +389,8 @@ public class JeuFX {
             jeu.getPartie().removeEmplacementsDrapeaux(new Integer[]{matCase.getRow(), matCase.getColumn()});
             jeu.getPartie().ajouterDrapeaux();
         }
-        System.out.println(matCase.getDrapeau());
         updateDrapeauxFX();
+        return matCase;
     }
 
     public void decouvrirZoneSure(Terrain t){
