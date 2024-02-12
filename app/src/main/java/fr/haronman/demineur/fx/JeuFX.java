@@ -243,6 +243,7 @@ public class JeuFX {
         stage.sizeToScene();
         stage.setResizable(false);
         stage.show();
+        System.err.println(jeu.getPartie().getPlateau());
     }
 
     public VBox AffichagePlateau(){
@@ -253,6 +254,7 @@ public class JeuFX {
         for(int row = 0; row < mat.length; row++){
             HBox col = new HBox();
             for(int column = 0; column < mat[row].length; column++){
+                int x = row, y = column;
                 Case c = jeu.getPartie().getCaseMatrice(row, column);
 
                 ImageView iv = new ImageView(c.getImage());
@@ -302,7 +304,8 @@ public class JeuFX {
                             //Lancement du minuteur
                             if(jeu.getPartie().getPremierClic()){
                                 jeu.getPartie().premierClicEffectue();
-                                jeu.getPartie().getPlateau().placerMines(c);
+                                Terrain t = jeu.getPartie().replacerMine(c);
+                                jeu.getPartie().getMatricePlateau()[x][y] = t;
                                 timeline.play();
                             }
                             // Si on souhaite la découvrir
@@ -319,14 +322,27 @@ public class JeuFX {
                 bp.setOnMouseClicked(event -> {
                     if(jeu.getPartie().getPremierClic()){
                         jeu.getPartie().premierClicEffectue();
-                        jeu.getPartie().getPlateau().placerMines(c);
                         timeline.play();
                     }
-
                     if(event.getButton() == MouseButton.SECONDARY) {
                         // Si on souhaite manipuler les drapeaux
                         if(!c.getDecouvert()){
-                            iv.setImage(placerDrapeau(c).getImage());
+                            if(!c.getDrapeau()){
+                                // Placer un drapeau
+                                if(jeu.getPartie().getNbrDrapeaux() > 0){
+                                    // Si il reste au moins un drapeau en stock
+                                    c.insererDrapeau();
+                                    jeu.getPartie().retirerDrapeaux();
+                                    jeu.getPartie().addEmplacementsDrapeaux(new Integer[]{c.getRow(), c.getColumn()});
+                                }
+                            }else{
+                                // Retirer un drapeau
+                                c.retirerDrapeau();
+                                jeu.getPartie().removeEmplacementsDrapeaux(new Integer[]{c.getRow(), c.getColumn()});
+                                jeu.getPartie().ajouterDrapeaux();
+                            }
+                            updateDrapeauxFX();
+                            iv.setImage(c.getImage());
                         }
                     }
                 });
@@ -372,27 +388,6 @@ public class JeuFX {
         }
     }
 
-    public Case placerDrapeau(Case c){
-        Case matCase = jeu.getPartie().getCaseMatrice(c.getRow(), c.getColumn());
-        if(!matCase.getDrapeau()){
-            // Placer un drapeau
-            if(jeu.getPartie().getNbrDrapeaux() > 0){
-                // Si il reste au moins un drapeau en stock
-                matCase.insererDrapeau();
-                jeu.getPartie().retirerDrapeaux();
-                jeu.getPartie().addEmplacementsDrapeaux(new Integer[]{matCase.getRow(), matCase.getColumn()});
-            }
-        }else{
-            // Retirer un drapeau
-            matCase.retirerDrapeau();
-            System.out.println("Case : "+matCase);
-            jeu.getPartie().removeEmplacementsDrapeaux(new Integer[]{matCase.getRow(), matCase.getColumn()});
-            jeu.getPartie().ajouterDrapeaux();
-        }
-        updateDrapeauxFX();
-        return matCase;
-    }
-
     public void decouvrirZoneSure(Terrain t){
         Case[][] mat = jeu.getPartie().getMatricePlateau();
 
@@ -404,12 +399,7 @@ public class JeuFX {
                         if(!(mat[i][j] instanceof Mine)){
                             Terrain newTerrain = (Terrain) mat[i][j];
                             
-                            if(!newTerrain.getDecouvert()){
-                                if(newTerrain.getDrapeau()){
-                                    newTerrain.retirerDrapeau();
-                                    jeu.getPartie().removeEmplacementsDrapeaux(new Integer[]{newTerrain.getRow(), newTerrain.getColumn()});
-                                    jeu.getPartie().ajouterDrapeaux();
-                                }
+                            if(!newTerrain.getDecouvert() && !newTerrain.getDrapeau()){
                                 jeu.getPartie().getPlateau().calculerBombesProches(newTerrain);
                                 newTerrain.updateImage();
                                 newTerrain.decouvrir();
