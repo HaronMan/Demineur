@@ -12,6 +12,7 @@ import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -20,6 +21,7 @@ import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
@@ -384,6 +386,11 @@ public class JeuFX {
                 try {
                     updateVisage(Visage.WIN);
                     victoire();
+                    Alert victoire = new Alert(AlertType.INFORMATION, 
+                        "Vous avez gagné une partie "+jeu.getPartie().getDifficulte().getNom()+" en "+timerFX.getText()
+                    );
+                    victoire.setTitle("Vous avez gagné !!!");
+                    victoire.showAndWait();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -510,7 +517,7 @@ public class JeuFX {
         nbrDrapeauFX.setText(" : "+String.valueOf(nbr));
         // Pour afficher le texte en rouge, il faut que le nombre de drapeaux
         // restant inférieur à 30% du nombre de drapeau (nombre de bombe) initiale
-        if(nbr < Math.round(jeu.getPartie().getDifficulte().getNbrBombe() * 30 / 100)){
+        if(nbr <= Math.round(jeu.getPartie().getDifficulte().getNbrBombe() * 30 / 100)){
             
             nbrDrapeauFX.setTextFill(Color.rgb(180, 0, 0));
         }else{
