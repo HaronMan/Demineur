@@ -55,6 +55,7 @@ public class Partie {
                 matrice[x][y] = new Mine(x, y);
                 plateau.getEmplacementsMines().removeIf(coordonnees -> Arrays.equals(coordonnees, new Integer[]{c.getRow(), c.getColumn()}));
                 plateau.getEmplacementsMines().add(new Integer[]{x, y});
+                System.out.println(x+" "+y);
                 t = new Terrain(c.getRow(), c.getColumn());
                 placee = true;
             }

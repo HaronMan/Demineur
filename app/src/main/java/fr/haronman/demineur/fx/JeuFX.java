@@ -243,7 +243,7 @@ public class JeuFX {
         stage.sizeToScene();
         stage.setResizable(false);
         stage.show();
-        System.err.println(jeu.getPartie().getPlateau());
+        System.out.println(jeu.getPartie().getPlateau());
     }
 
     public VBox AffichagePlateau(){
@@ -304,12 +304,19 @@ public class JeuFX {
                             //Lancement du minuteur
                             if(jeu.getPartie().getPremierClic()){
                                 jeu.getPartie().premierClicEffectue();
-                                Terrain t = jeu.getPartie().replacerMine(c);
-                                jeu.getPartie().getMatricePlateau()[x][y] = t;
                                 timeline.play();
-                            }
-                            // Si on souhaite la découvrir
-                            if(!c.getDecouvert() && !c.getDrapeau()){
+                                if(c instanceof Mine){
+                                    c.decouvrir();
+                                    Terrain t = jeu.getPartie().replacerMine(c);
+                                    jeu.getPartie().getMatricePlateau()[x][y] = t;
+                                    System.out.println(jeu.getPartie().getPlateau());
+                                    if(!t.getDecouvert() && !t.getDrapeau()){ // Si on souhaite la découvrir
+                                        // Condtions : caché et pas de drapeau
+                                    devoiler(t);
+                                    iv.setImage(t.getImage());
+                                    }
+                                }
+                            }if(!c.getDecouvert() && !c.getDrapeau()){ // Si on souhaite la découvrir
                                 // Condtions : caché et pas de drapeau
                                 devoiler(c);
                                 iv.setImage(c.getImage());
