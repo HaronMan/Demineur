@@ -1,5 +1,8 @@
 package fr.haronman.demineur.model;
 
+import java.util.Arrays;
+import java.util.Random;
+
 import fr.haronman.demineur.model.Plateau.Plateau;
 import fr.haronman.demineur.model.Plateau.Case.Case;
 import fr.haronman.demineur.model.Plateau.Case.Mine;
@@ -32,17 +35,32 @@ public class Partie {
         return plateau.getCase(row, column);
     }
 
-    public void setCaseMatrice(Case c){
-        int row = c.getRow(), column = c.getColumn();
-        plateau.getMatrice()[row][column] = c;
-    }
-
     public void addEmplacementsDrapeaux(Integer[] pos){
         plateau.getEmplacementsDrapeaux().add(pos);
     }
 
     public void removeEmplacementsDrapeaux(Integer[] pos){
-        plateau.getEmplacementsDrapeaux().remove(pos);
+        plateau.getEmplacementsDrapeaux().removeIf(coordonnees -> Arrays.equals(coordonnees, pos));
+    }
+
+    public Terrain replacerMine(Case c){
+        Terrain t = null;
+        Case[][] matrice = getMatricePlateau();
+        Random r = new Random();
+        boolean placee = false;
+        while(!placee){
+            int x = r.nextInt(matrice.length);
+            int y = r.nextInt(matrice[0].length);
+            if( !(matrice[x][y] instanceof Mine) && matrice[x][y] != c){
+                matrice[x][y] = new Mine(x, y);
+                plateau.getEmplacementsMines().removeIf(coordonnees -> Arrays.equals(coordonnees, new Integer[]{c.getRow(), c.getColumn()}));
+                plateau.getEmplacementsMines().add(new Integer[]{x, y});
+                System.out.println(x+" "+y);
+                t = new Terrain(c.getRow(), c.getColumn());
+                placee = true;
+            }
+        }
+        return t;
     }
 
     public void devoilerMines(){
