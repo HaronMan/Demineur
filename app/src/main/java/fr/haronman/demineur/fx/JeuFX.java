@@ -184,14 +184,16 @@ public class JeuFX {
         // Visage
         HBox img = new HBox();
         visage.setOnMouseClicked(event -> {
-            Difficulte courant = jeu.getPartie().getDifficulte();
-            try {
-                updateVisage(Visage.IDLE);
-                timeline.stop();
-                secondes = 0;
-                jeu.start(courant);
-            } catch (Exception e) {
-                e.printStackTrace();
+            if(!jeu.getPartie().getPremierClic()){
+                Difficulte courant = jeu.getPartie().getDifficulte();
+                try {
+                    updateVisage(Visage.IDLE);
+                    timeline.stop();
+                    secondes = 0;
+                    jeu.start(courant);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
         img.getChildren().add(visage);
