@@ -243,7 +243,6 @@ public class JeuFX {
         stage.sizeToScene();
         stage.setResizable(false);
         stage.show();
-        System.out.println(jeu.getPartie().getPlateau());
     }
 
     public VBox AffichagePlateau(){
@@ -309,7 +308,6 @@ public class JeuFX {
                                     c.decouvrir();
                                     Terrain t = jeu.getPartie().replacerMine(c);
                                     jeu.getPartie().getMatricePlateau()[x][y] = t;
-                                    System.out.println(jeu.getPartie().getPlateau());
                                     if(!t.getDecouvert() && !t.getDrapeau()){ // Si on souhaite la découvrir
                                         // Condtions : caché et pas de drapeau
                                     devoiler(t);
