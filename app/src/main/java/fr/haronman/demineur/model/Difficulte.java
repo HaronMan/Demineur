@@ -5,7 +5,7 @@ import java.util.Optional;
 public enum Difficulte {
     FACILE(0, "Facile", 10, 10, 10),
     INTERMEDIAIRE(1, "Intermédiaire", 16, 16, 40),
-    DIFFICILE(2, "Difficile", 16, 31, 90),
+    DIFFICILE(2, "Difficile", 16, 31, 99),
     EXPERT(3, "Expert", 30, 50, 300),
     IMPOSSIBLE(4, "Impossible", 75, 80, 1000),
     HARDCORE(5, "HARDCORE", 100, 150, 3000);

@@ -240,7 +240,6 @@ public class JeuFX {
             sp.setFitToHeight(true);
             stage.setScene(new Scene(sp, 1200, 925));
         }else{
-
             stage.setScene(new Scene(root));
         }
         stage.getIcons().add(new Image("img/icon.png"));
