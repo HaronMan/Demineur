@@ -11,7 +11,7 @@ Chaque partie enregistrées possèdera un nom unique et non modifiable (10 carac
 ### /!\ Notes /!\
 - Une seule sauvegarde par partie sera autorisé.
 - Si existante, elle sera écrasée par la nouvelle sauvegarde.
-- Si défaite, la sauvegarde est automatiquement supprimé
+- Si victoire, la sauvegarde est automatiquement supprimé
 
 ## Tableau de scores (EN COURS)
 Un tableau des scores sera disponible également : pour chaque difficulté sera affiché les 10 meilleurs temps, cette partie possèdera un nom unique.
