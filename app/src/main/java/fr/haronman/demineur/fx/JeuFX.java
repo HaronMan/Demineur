@@ -101,12 +101,9 @@ public class JeuFX {
 
         sauvegarder.setOnAction(action -> {
             try {
-                jeu.save(jeu.getPartie(), "TEST");
-                Alert alert = new Alert(AlertType.INFORMATION);
-                alert.setTitle("Sauvegarde");
-                alert.setHeaderText("Sauvegarde effectuée");
-                alert.setContentText("La partie a été sauvegardée avec succès");
-                alert.showAndWait();
+                NomSauvegardeFX sauvegardeFX = new NomSauvegardeFX();
+                sauvegardeFX.show();
+                jeu.save(jeu.getPartie(), sauvegardeFX.getNom());
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
