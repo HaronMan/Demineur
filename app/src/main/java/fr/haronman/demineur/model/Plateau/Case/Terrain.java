@@ -1,13 +1,16 @@
 package fr.haronman.demineur.model.Plateau.Case;
 
+import fr.haronman.demineur.fx.CaseImageBuilder;
 import javafx.scene.image.Image;
 
 public class Terrain extends Case{
     private int bombesProches;
+    private boolean fausse_mine;
 
     public Terrain(int row, int column){
         super(row, column);
         bombesProches = 0;
+        fausse_mine = false;
     }
 
     public int getBombesProches() {
@@ -18,12 +21,22 @@ public class Terrain extends Case{
         this.bombesProches = bombesProches;
     }
 
-    public void updateImage() {
-        setImage(new Image("img/box/terrain_" + bombesProches + ".png"));
+    @Override
+    public Image getImage() {
+        if(!getDecouvert()){
+            if(getDrapeau()){
+                return CaseImageBuilder.HIDDEN_FLAG.image;
+            }
+            return CaseImageBuilder.HIDDEN.image;
+        }
+        if(fausse_mine){
+            return CaseImageBuilder.FLAG_INCORRECT.image;
+        }
+        return new Image("img/box/terrain_" + bombesProches + ".png");
     }
 
     public void fausse_mine() {
         decouvrir();
-        setImage(new Image("img/flag/flag_incorrect.png"));
+        fausse_mine = true;
     }
 }

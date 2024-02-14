@@ -3,6 +3,7 @@ package fr.haronman.demineur.model.Plateau.Case;
 import java.io.Serial;
 import java.io.Serializable;
 
+import fr.haronman.demineur.fx.CaseImageBuilder;
 import javafx.scene.image.Image;
 
 public abstract class Case implements Serializable{
@@ -11,7 +12,6 @@ public abstract class Case implements Serializable{
     private boolean decouvert;
     private boolean drapeau;
     private final int row, column;
-    private Image image;
 
     public Case(int row, int column){
         decouvert = false;
@@ -52,21 +52,9 @@ public abstract class Case implements Serializable{
         return column;
     }
 
-    public Image getImage() {
-        if(!decouvert){
-            if(drapeau){
-                return new Image("img/flag/hidden_flag.png");
-            }
-            return new Image("img/box/hidden.png");
-        }
-        return image;
-    }
+    public abstract Image getImage();
 
     public Image onClickImage(){
-        return new Image("img/box/terrain_0.png");
-    }
-
-    public void setImage(Image image) {
-        this.image = image;
+        return CaseImageBuilder.ONCLICK.image;
     }
 }

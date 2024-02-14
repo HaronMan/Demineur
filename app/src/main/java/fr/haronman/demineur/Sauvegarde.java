@@ -2,23 +2,32 @@ package fr.haronman.demineur;
 
 import fr.haronman.demineur.model.Partie;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Optional;
 
 public class Sauvegarde implements Serializable{
-    public static final String CHEMIN_SAUVEGARDE = System.getProperty("user.dir")+"/src/main/resources/saves/test.save";
-    private final String nom;
-    private Partie partie;
+    private static final String CHEMIN_SAUVEGARDE = System.getProperty("user.dir")+"/src/main/resources/saves/test.save";
 
-    public Sauvegarde(String nom, Partie partie){
-        this.nom = nom;
-        this.partie = partie;
+    public Sauvegarde(){}
+
+    public void save(Partie partie, String nom) throws IOException, ClassNotFoundException{
+        // Sauvegarde dans un fichier (resources/save)
+        FileOutputStream fos = new FileOutputStream(Sauvegarde.CHEMIN_SAUVEGARDE);
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+        oos.writeObject(partie);
+        oos.close();
     }
 
-    public String getNom() {
-        return nom;
-    }
-
-    public Partie getPartie() {
-        return partie;
+    public Optional<Partie> load(String nom) throws IOException, ClassNotFoundException{
+        // Chargement d'une partie dans un fichier
+        FileInputStream fis = new FileInputStream(Sauvegarde.CHEMIN_SAUVEGARDE);
+        ObjectInputStream ois = new ObjectInputStream(fis);
+        return Optional.ofNullable((Partie) ois.readObject());
     }
 }

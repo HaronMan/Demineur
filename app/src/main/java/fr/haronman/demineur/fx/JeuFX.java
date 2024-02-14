@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import fr.haronman.demineur.model.Difficulte;
 import fr.haronman.demineur.model.Jeu;
+import fr.haronman.demineur.model.Partie;
 import fr.haronman.demineur.model.Plateau.Case.Case;
 import fr.haronman.demineur.model.Plateau.Case.Mine;
 import fr.haronman.demineur.model.Plateau.Case.Terrain;
@@ -97,18 +98,36 @@ public class JeuFX {
         if(jeu.getFin()){
             sauvegarder.setDisable(true);
         }
+
         sauvegarder.setOnAction(action -> {
             try {
-                jeu.save();
+                jeu.save(jeu.getPartie(), "TEST");
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Sauvegarde");
+                alert.setHeaderText("Sauvegarde effectuée");
+                alert.setContentText("La partie a été sauvegardée avec succès");
+                alert.showAndWait();
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }    
         });
 
         MenuItem charger = new MenuItem("Charger");
         charger.setOnAction(action -> {
-            System.err.println("Chargement non implémenté");
-            // TODO Charger partie
+            try {
+                Optional<Partie> loadPartie = jeu.load("Test");
+                loadPartie.ifPresent(p -> {
+                    try {
+                        jeu.start(p);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }    
         });
 
         MenuItem tableauScore = new MenuItem("Tableau des scores");
@@ -386,7 +405,6 @@ public class JeuFX {
             }
         }else if(matCase instanceof Terrain t){
             jeu.getPartie().getPlateau().calculerBombesProches(t);
-            t.updateImage();
             t.decouvrir();
             jeu.getPartie().retirerCaseRestante();
             
@@ -411,6 +429,20 @@ public class JeuFX {
         }
     }
 
+    public Image getImage(Case c){
+        if(!c.getDecouvert()){
+            if(!c.getDrapeau()){
+                if(c instanceof Terrain){
+
+                }else if(c instanceof Mine){
+
+                }
+            }
+            return new Image("resources/flag/hidden_flag.png");
+        }
+        return new Image("resources/box/hidden.png");
+    }
+
     public void decouvrirZoneSure(Terrain t){
         Case[][] mat = jeu.getPartie().getMatricePlateau();
 
@@ -424,7 +456,6 @@ public class JeuFX {
                             
                             if(!newTerrain.getDecouvert() && !newTerrain.getDrapeau()){
                                 jeu.getPartie().getPlateau().calculerBombesProches(newTerrain);
-                                newTerrain.updateImage();
                                 newTerrain.decouvrir();
                                 
                                 HBox hb = (HBox) plateauFX.getChildren().get(i);
