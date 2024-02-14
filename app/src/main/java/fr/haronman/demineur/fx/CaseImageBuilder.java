@@ -11,7 +11,6 @@ public enum CaseImageBuilder {
     MINE_CLICKED("img/box/mine_clicked.png"),
     ONCLICK("img/box/terrain_0.png");
 
-
     public final Image image;
 
     private CaseImageBuilder(String url){

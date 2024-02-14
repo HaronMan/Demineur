@@ -30,4 +30,8 @@ public class Sauvegarde implements Serializable{
         ObjectInputStream ois = new ObjectInputStream(fis);
         return Optional.ofNullable((Partie) ois.readObject());
     }
+
+    public static void delete(String nom){
+        // TODO Supprimer une partie après victoire
+    }
 }
