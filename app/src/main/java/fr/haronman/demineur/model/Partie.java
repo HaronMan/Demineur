@@ -2,13 +2,14 @@ package fr.haronman.demineur.model;
 
 import java.util.Arrays;
 import java.util.Random;
+import java.io.Serializable;
 
 import fr.haronman.demineur.model.Plateau.Plateau;
 import fr.haronman.demineur.model.Plateau.Case.Case;
 import fr.haronman.demineur.model.Plateau.Case.Mine;
 import fr.haronman.demineur.model.Plateau.Case.Terrain;
 
-public class Partie {
+public class Partie implements Serializable{
     private Plateau plateau;
     private int drapeaux;
     private int cases_restantes;
@@ -55,7 +56,6 @@ public class Partie {
                 matrice[x][y] = new Mine(x, y);
                 plateau.getEmplacementsMines().removeIf(coordonnees -> Arrays.equals(coordonnees, new Integer[]{c.getRow(), c.getColumn()}));
                 plateau.getEmplacementsMines().add(new Integer[]{x, y});
-                System.out.println(x+" "+y);
                 t = new Terrain(c.getRow(), c.getColumn());
                 placee = true;
             }

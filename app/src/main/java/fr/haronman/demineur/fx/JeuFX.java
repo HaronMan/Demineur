@@ -1,5 +1,6 @@
 package fr.haronman.demineur.fx;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import fr.haronman.demineur.model.Difficulte;
@@ -93,9 +94,15 @@ public class JeuFX {
         Menu jeuBarre = new Menu("Jeu");
 
         MenuItem sauvegarder = new MenuItem("Sauvegarder");
+        if(jeu.getFin()){
+            sauvegarder.setDisable(true);
+        }
         sauvegarder.setOnAction(action -> {
-            // TODO Sauvegarde partie
-            System.err.println("Sauvegarde non implémentée");
+            try {
+                jeu.save();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }    
         });
 
         MenuItem charger = new MenuItem("Charger");
@@ -371,6 +378,7 @@ public class JeuFX {
             // Si cliqué sur une mine
             m.touchee();
             try {
+                jeu.setFin(true);
                 updateVisage(Visage.LOSE);
                 defaite(m);
             } catch (Exception e) {
@@ -384,6 +392,7 @@ public class JeuFX {
             
             if(jeu.getPartie().getCasesRestantes() == 0){
                 try {
+                    jeu.setFin(true);
                     updateVisage(Visage.WIN);
                     victoire();
                     Alert victoire = new Alert(AlertType.INFORMATION, 
