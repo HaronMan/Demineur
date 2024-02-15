@@ -26,6 +26,8 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -266,6 +268,15 @@ public class JeuFX {
 
             stage.setScene(new Scene(root));
         }
+
+        stage.getScene().setOnKeyPressed(event -> {
+            try {
+                interactionClavier(event);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
         stage.getIcons().add(new Image("img/icon.png"));
         stage.sizeToScene();
         stage.setResizable(false);
@@ -413,7 +424,8 @@ public class JeuFX {
                     Alert victoire = new Alert(AlertType.INFORMATION, 
                         "Vous avez gagné une partie "+jeu.getPartie().getDifficulte().getNom()+" en "+timerFX.getText()
                     );
-                    victoire.setTitle("Vous avez gagné !!!");
+                    victoire.setTitle("Victoire");
+                    victoire.setHeaderText("Vous avez gagné !!!");
                     victoire.showAndWait();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -581,5 +593,17 @@ public class JeuFX {
         text += (m > 0) ? m+"m" : "";
         text += s+"s";
         timerFX.setText(text);
+    }
+
+    public void interactionClavier(KeyEvent keyEvent) throws Exception{
+        if(keyEvent.getCode() == KeyCode.R){
+            if(!jeu.getPartie().getPremierClic()){
+                Difficulte courant = jeu.getPartie().getDifficulte();
+                updateVisage(Visage.IDLE);
+                timeline.stop();
+                secondes = 0;
+                jeu.start(courant);
+            }
+        }
     }
 }
