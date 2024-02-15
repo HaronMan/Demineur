@@ -2,14 +2,17 @@ package fr.haronman.demineur.model;
 
 import java.util.Arrays;
 import java.util.Random;
+import java.io.Serializable;
 
 import fr.haronman.demineur.model.Plateau.Plateau;
 import fr.haronman.demineur.model.Plateau.Case.Case;
 import fr.haronman.demineur.model.Plateau.Case.Mine;
 import fr.haronman.demineur.model.Plateau.Case.Terrain;
 
-public class Partie {
+public class Partie implements Serializable{
+    public static final long serialVersionUID = 2273883084829754458L;
     private Plateau plateau;
+    private String nomSave;
     private int drapeaux;
     private int cases_restantes;
     private boolean premier_clic;
@@ -55,7 +58,6 @@ public class Partie {
                 matrice[x][y] = new Mine(x, y);
                 plateau.getEmplacementsMines().removeIf(coordonnees -> Arrays.equals(coordonnees, new Integer[]{c.getRow(), c.getColumn()}));
                 plateau.getEmplacementsMines().add(new Integer[]{x, y});
-                System.out.println(x+" "+y);
                 t = new Terrain(c.getRow(), c.getColumn());
                 placee = true;
             }
@@ -104,6 +106,14 @@ public class Partie {
 
     public void ajouterDrapeaux() {
         this.drapeaux++;
+    }
+
+    public String getNomSave() {
+        return nomSave;
+    }
+
+    public void setNomSave(String nomSave) {
+        this.nomSave = nomSave;
     }
 
     public int getNbrDrapeaux(){
