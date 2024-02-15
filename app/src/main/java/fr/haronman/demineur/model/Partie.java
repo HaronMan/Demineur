@@ -11,12 +11,13 @@ import fr.haronman.demineur.model.Plateau.Case.Terrain;
 
 public class Partie implements Serializable{
     public static final long serialVersionUID = 2273883084829754458L;
-    private Plateau plateau;
     private String nomSave;
+    private Plateau plateau;
     private int drapeaux;
     private int cases_restantes;
     private boolean premier_clic;
     private final Difficulte difficulte;
+    private int secondes;
     
     public Partie(Difficulte difficulte){
         this.difficulte = difficulte;
@@ -119,7 +120,7 @@ public class Partie implements Serializable{
     public int getNbrDrapeaux(){
         return drapeaux;
     }
-
+    
     public Difficulte getDifficulte(){
         return difficulte;
     }
@@ -130,5 +131,17 @@ public class Partie implements Serializable{
 
     public void premierClicEffectue(){
         premier_clic = false;
+    }
+
+    public int getSecondes() {
+        return secondes;
+    }
+
+    public void setSecondes(int secondes) {
+        this.secondes = secondes;
+    }
+
+    public void incrementSecondes(){
+        secondes++;
     }
 }

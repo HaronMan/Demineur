@@ -55,8 +55,7 @@ public class JeuFX {
     private Label nbrDrapeauFX;
     private ImageView visage;
     private Label timerFX;
-    private int secondes;
-    private Timeline timeline;
+    private Timeline chrono;
     private boolean mouseInsideBP;
 
     public JeuFX(Stage stage, Jeu jeu){
@@ -67,21 +66,45 @@ public class JeuFX {
         this.visage = new ImageView(Visage.IDLE.getImage());
         this.timerFX = new Label();
         timerFX.setFont(Font.font(20));
-        secondes = 0;
         initTimer();
     }
 
+    public JeuFX(Stage stage, Jeu jeu, int secondes){
+        this.jeu = jeu;
+        this.stage = stage;
+        this.nbrDrapeauFX = new Label();
+        nbrDrapeauFX.setFont(Font.font(20));
+        this.visage = new ImageView(Visage.IDLE.getImage());
+        this.timerFX = new Label();
+        timerFX.setFont(Font.font(20));
+        initTimer(secondes);
+    }
+
     public void initTimer(){
-        timeline = new Timeline();
-        timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(1), event -> {
-            secondes++;
+        chrono = new Timeline();
+        chrono.getKeyFrames().add(new KeyFrame(Duration.seconds(1), event -> {
+            jeu.getPartie().incrementSecondes();
             try {
                 updateTimerFX();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }));
-        timeline.setCycleCount(Timeline.INDEFINITE);
+        chrono.setCycleCount(Timeline.INDEFINITE);
+    }
+
+    public void initTimer(int secondes){
+        jeu.getPartie().setSecondes(secondes);
+        chrono = new Timeline();
+        chrono.getKeyFrames().add(new KeyFrame(Duration.seconds(1), event -> {
+            jeu.getPartie().incrementSecondes();
+            try {
+                updateTimerFX();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }));
+        chrono.setCycleCount(Timeline.INDEFINITE);
     }
 
     public void jouer() throws Exception{
@@ -106,21 +129,31 @@ public class JeuFX {
 
         sauvegarder.setOnAction(action -> {
             try {
+                chrono.stop();
                 NomSauvegardeFX sauvegardeFX = new NomSauvegardeFX();
                 if(jeu.getPartie().getNomSave() == null){
                     sauvegardeFX.show();
-                    if(!sauvegardeFX.getNom().isEmpty()){
-                        jeu.save(jeu.getPartie(), sauvegardeFX.getNom().toLowerCase());
+                    if(sauvegardeFX.getNom() != null){
+                        jeu.getPartie().setNomSave(sauvegardeFX.getNom().toLowerCase());
+                        jeu.save(jeu.getPartie());
+
+                        Alert confirmation = new Alert(AlertType.INFORMATION, 
+                    "La partie a bien été sauvegardée"
+                        );
+                        confirmation.setTitle("Sauvegarde");
+                        confirmation.setHeaderText("Sauvegarde effectué");
+                        confirmation.showAndWait();
                     }
                 }else{
-                    jeu.save(jeu.getPartie(), jeu.getPartie().getNomSave());
-                }
-                Alert confirmation = new Alert(AlertType.INFORMATION, 
+                    jeu.save(jeu.getPartie());
+                    Alert confirmation = new Alert(AlertType.INFORMATION, 
                     "La partie a bien été sauvegardée"
-                );
+                        );
                     confirmation.setTitle("Sauvegarde");
                     confirmation.setHeaderText("Sauvegarde effectué");
                     confirmation.showAndWait();
+                }
+                chrono.play();
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
@@ -131,6 +164,7 @@ public class JeuFX {
         MenuItem charger = new MenuItem("Charger");
         charger.setOnAction(action -> {
             try {
+                chrono.stop();
                 FileChooser fc = new FileChooser();
                 fc.setTitle("Choississez une sauvegarde");
                 //Voir uniquement les fichiers .save
@@ -139,17 +173,18 @@ public class JeuFX {
                 fc.setInitialDirectory(new File(Sauvegarde.CHEMIN_SAUVEGARDE));
 
                 File sauvegarde = fc.showOpenDialog(stage);
-                String nomFichier = sauvegarde.getName();
-                String nomSave = nomFichier.substring(0, nomFichier.lastIndexOf("."));
-
-                Optional<Partie> loadPartie = jeu.load(sauvegarde);
-                loadPartie.ifPresent(p -> {
-                    try {
-                        jeu.start(p, nomSave);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                });
+                if(sauvegarde != null){
+                    Optional<Partie> loadPartie = jeu.load(sauvegarde);
+                    loadPartie.ifPresent(p -> {
+                        try {
+                            jeu.start(p);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
+                }else{
+                    chrono.play();
+                }
                 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -195,8 +230,7 @@ public class JeuFX {
                     if(d.isPresent()){
                         try {
                             updateVisage(Visage.IDLE);
-                            timeline.stop();
-                            secondes = 0;
+                            chrono.stop();
                             jeu.start(d.get());
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -242,8 +276,8 @@ public class JeuFX {
                 Difficulte courant = jeu.getPartie().getDifficulte();
                 try {
                     updateVisage(Visage.IDLE);
-                    timeline.stop();
-                    secondes = 0;
+                    chrono.stop();
+                    jeu.getPartie().setSecondes(0);
                     jeu.start(courant);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -367,7 +401,7 @@ public class JeuFX {
                             //Lancement du minuteur
                             if(jeu.getPartie().getPremierClic()){
                                 jeu.getPartie().premierClicEffectue();
-                                timeline.play();
+                                chrono.play();
                                 if(c instanceof Mine){
                                     c.decouvrir();
                                     Terrain t = jeu.getPartie().replacerMine(c);
@@ -391,7 +425,7 @@ public class JeuFX {
                 bp.setOnMouseClicked(event -> {
                     if(jeu.getPartie().getPremierClic()){
                         jeu.getPartie().premierClicEffectue();
-                        timeline.play();
+                        chrono.play();
                     }
                     if(event.getButton() == MouseButton.SECONDARY) {
                         // Si on souhaite manipuler les drapeaux
@@ -545,7 +579,7 @@ public class JeuFX {
             }
             lignes.getChildren().add(col);
         }
-        timeline.stop();
+        chrono.stop();
         show(lignes);
     }
 
@@ -583,7 +617,7 @@ public class JeuFX {
             }
             lignes.getChildren().add(col);
         }
-        timeline.stop();
+        chrono.stop();
         show(lignes);
     }
 
@@ -605,7 +639,7 @@ public class JeuFX {
     }
 
     public void updateTimerFX() throws Exception{
-        int m = 0, h = 0, s = secondes;
+        int m = 0, h = 0, s = jeu.getPartie().getSecondes();
         String text = "";
         while(s >= 60){
             m++;
@@ -626,8 +660,8 @@ public class JeuFX {
             if(!jeu.getPartie().getPremierClic()){
                 Difficulte courant = jeu.getPartie().getDifficulte();
                 updateVisage(Visage.IDLE);
-                timeline.stop();
-                secondes = 0;
+                chrono.stop();
+                jeu.getPartie().setSecondes(0);
                 jeu.start(courant);
             }
         }

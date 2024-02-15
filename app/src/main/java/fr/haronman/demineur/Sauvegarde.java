@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -17,9 +16,9 @@ public class Sauvegarde implements Serializable{
 
     public Sauvegarde(){}
 
-    public void save(Partie partie, String nom) throws IOException, ClassNotFoundException{
+    public void save(Partie partie) throws IOException, ClassNotFoundException{
         // Sauvegarde dans un fichier (resources/save)
-        String nomFichier = nom+".save";
+        String nomFichier = partie.getNomSave()+".save";
         File fichier = new File(Sauvegarde.CHEMIN_SAUVEGARDE+"\\"+nomFichier);
         if(!fichier.exists()){
             fichier.createNewFile();
@@ -40,5 +39,24 @@ public class Sauvegarde implements Serializable{
 
     public static void delete(String nom){
         // TODO Supprimer une partie après victoire
+    }
+
+    public static boolean nomDejaExistant(String nom){
+        File[] fichiers = new File(CHEMIN_SAUVEGARDE).listFiles();
+        for(File f : fichiers){
+        }
+        if(fichiers != null || fichiers.length > 0){
+            for(File f : fichiers){
+                if(f.isFile() && f.getName().endsWith(".save")){
+                    String nomFichier = f.getName();
+                    nomFichier = nomFichier.substring(0, nomFichier.lastIndexOf("."));
+                    System.out.println(nomFichier);
+                    if(nomFichier.equals(nom)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

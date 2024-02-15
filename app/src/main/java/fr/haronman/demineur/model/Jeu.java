@@ -22,10 +22,10 @@ public class Jeu {
         jeuFX.jouer();
     }
 
-    public void start(Partie partie, String nomSave) throws Exception{
+    public void start(Partie partie) throws Exception{
         this.partie = partie;
-        partie.setNomSave(nomSave);
         fin = false;
+        partie.setSecondes(partie.getSecondes());
         jeuFX.jouer();
     }
 
@@ -52,8 +52,8 @@ public class Jeu {
         this.fin = fin;
     }
 
-    public void save(Partie partie, String nom) throws IOException, ClassNotFoundException{
-        new Sauvegarde().save(partie, nom);
+    public void save(Partie partie) throws IOException, ClassNotFoundException{
+        new Sauvegarde().save(partie);
     }
 
     public Optional<Partie> load(File file) throws IOException, ClassNotFoundException{
