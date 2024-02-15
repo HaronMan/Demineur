@@ -1,9 +1,13 @@
 package fr.haronman.demineur.fx;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Optional;
 
+import fr.haronman.demineur.Sauvegarde;
 import fr.haronman.demineur.model.Difficulte;
 import fr.haronman.demineur.model.Jeu;
+import fr.haronman.demineur.model.Partie;
 import fr.haronman.demineur.model.Plateau.Case.Case;
 import fr.haronman.demineur.model.Plateau.Case.Mine;
 import fr.haronman.demineur.model.Plateau.Case.Terrain;
@@ -24,6 +28,8 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -38,6 +44,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -93,15 +100,60 @@ public class JeuFX {
         Menu jeuBarre = new Menu("Jeu");
 
         MenuItem sauvegarder = new MenuItem("Sauvegarder");
+        if(jeu.getFin()){
+            sauvegarder.setDisable(true);
+        }
+
         sauvegarder.setOnAction(action -> {
-            // TODO Sauvegarde partie
-            System.err.println("Sauvegarde non implémentée");
+            try {
+                NomSauvegardeFX sauvegardeFX = new NomSauvegardeFX();
+                if(jeu.getPartie().getNomSave() == null){
+                    sauvegardeFX.show();
+                    if(!sauvegardeFX.getNom().isEmpty()){
+                        jeu.save(jeu.getPartie(), sauvegardeFX.getNom().toLowerCase());
+                    }
+                }else{
+                    jeu.save(jeu.getPartie(), jeu.getPartie().getNomSave());
+                }
+                Alert confirmation = new Alert(AlertType.INFORMATION, 
+                    "La partie a bien été sauvegardée"
+                );
+                    confirmation.setTitle("Sauvegarde");
+                    confirmation.setHeaderText("Sauvegarde effectué");
+                    confirmation.showAndWait();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }    
         });
 
         MenuItem charger = new MenuItem("Charger");
         charger.setOnAction(action -> {
-            System.err.println("Chargement non implémenté");
-            // TODO Charger partie
+            try {
+                FileChooser fc = new FileChooser();
+                fc.setTitle("Choississez une sauvegarde");
+                //Voir uniquement les fichiers .save
+                FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Sauvegardes", "*.save");
+                fc.getExtensionFilters().add(extFilter);
+                fc.setInitialDirectory(new File(Sauvegarde.CHEMIN_SAUVEGARDE));
+
+                File sauvegarde = fc.showOpenDialog(stage);
+                String nomFichier = sauvegarde.getName();
+                String nomSave = nomFichier.substring(0, nomFichier.lastIndexOf("."));
+
+                Optional<Partie> loadPartie = jeu.load(sauvegarde);
+                loadPartie.ifPresent(p -> {
+                    try {
+                        jeu.start(p, nomSave);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+            }    
         });
 
         MenuItem tableauScore = new MenuItem("Tableau des scores");
@@ -242,6 +294,15 @@ public class JeuFX {
         }else{
             stage.setScene(new Scene(root));
         }
+
+        stage.getScene().setOnKeyPressed(event -> {
+            try {
+                interactionClavier(event);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
         stage.getIcons().add(new Image("img/icon.png"));
         stage.sizeToScene();
         stage.setResizable(false);
@@ -370,6 +431,7 @@ public class JeuFX {
             // Si cliqué sur une mine
             m.touchee();
             try {
+                jeu.setFin(true);
                 updateVisage(Visage.LOSE);
                 defaite(m);
             } catch (Exception e) {
@@ -377,18 +439,19 @@ public class JeuFX {
             }
         }else if(matCase instanceof Terrain t){
             jeu.getPartie().getPlateau().calculerBombesProches(t);
-            t.updateImage();
             t.decouvrir();
             jeu.getPartie().retirerCaseRestante();
             
             if(jeu.getPartie().getCasesRestantes() == 0){
                 try {
+                    jeu.setFin(true);
                     updateVisage(Visage.WIN);
                     victoire();
                     Alert victoire = new Alert(AlertType.INFORMATION, 
                         "Vous avez gagné une partie "+jeu.getPartie().getDifficulte().getNom()+" en "+timerFX.getText()
                     );
-                    victoire.setTitle("Vous avez gagné !!!");
+                    victoire.setTitle("Victoire");
+                    victoire.setHeaderText("Vous avez gagné !!!");
                     victoire.showAndWait();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -399,6 +462,20 @@ public class JeuFX {
                 decouvrirZoneSure(t);
             }
         }
+    }
+
+    public Image getImage(Case c){
+        if(!c.getDecouvert()){
+            if(!c.getDrapeau()){
+                if(c instanceof Terrain){
+
+                }else if(c instanceof Mine){
+
+                }
+            }
+            return new Image("resources/flag/hidden_flag.png");
+        }
+        return new Image("resources/box/hidden.png");
     }
 
     public void decouvrirZoneSure(Terrain t){
@@ -414,7 +491,6 @@ public class JeuFX {
                             
                             if(!newTerrain.getDecouvert() && !newTerrain.getDrapeau()){
                                 jeu.getPartie().getPlateau().calculerBombesProches(newTerrain);
-                                newTerrain.updateImage();
                                 newTerrain.decouvrir();
                                 
                                 HBox hb = (HBox) plateauFX.getChildren().get(i);
@@ -543,5 +619,17 @@ public class JeuFX {
         text += (m > 0) ? m+"m" : "";
         text += s+"s";
         timerFX.setText(text);
+    }
+
+    public void interactionClavier(KeyEvent keyEvent) throws Exception{
+        if(keyEvent.getCode() == KeyCode.R){
+            if(!jeu.getPartie().getPremierClic()){
+                Difficulte courant = jeu.getPartie().getDifficulte();
+                updateVisage(Visage.IDLE);
+                timeline.stop();
+                secondes = 0;
+                jeu.start(courant);
+            }
+        }
     }
 }
