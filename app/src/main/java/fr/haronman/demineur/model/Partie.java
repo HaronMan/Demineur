@@ -10,7 +10,9 @@ import fr.haronman.demineur.model.Plateau.Case.Mine;
 import fr.haronman.demineur.model.Plateau.Case.Terrain;
 
 public class Partie implements Serializable{
+    public static final long serialVersionUID = 2273883084829754458L;
     private Plateau plateau;
+    private String nomSave;
     private int drapeaux;
     private int cases_restantes;
     private boolean premier_clic;
@@ -104,6 +106,14 @@ public class Partie implements Serializable{
 
     public void ajouterDrapeaux() {
         this.drapeaux++;
+    }
+
+    public String getNomSave() {
+        return nomSave;
+    }
+
+    public void setNomSave(String nomSave) {
+        this.nomSave = nomSave;
     }
 
     public int getNbrDrapeaux(){

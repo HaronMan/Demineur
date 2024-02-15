@@ -2,13 +2,8 @@ package fr.haronman.demineur.fx;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
@@ -74,7 +69,7 @@ public class NomSauvegardeFX {
         Scene scene = new Scene(contenu, 350, 150);
         stage.setScene(scene);
         stage.setResizable(false);
-        stage.show();
+        stage.showAndWait();
     }
 
     public String getNom() {

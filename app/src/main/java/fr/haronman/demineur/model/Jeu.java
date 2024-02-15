@@ -3,6 +3,7 @@ package fr.haronman.demineur.model;
 import fr.haronman.demineur.Sauvegarde;
 import fr.haronman.demineur.fx.JeuFX;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -21,8 +22,9 @@ public class Jeu {
         jeuFX.jouer();
     }
 
-    public void start(Partie partie) throws Exception{
+    public void start(Partie partie, String nomSave) throws Exception{
         this.partie = partie;
+        partie.setNomSave(nomSave);
         fin = false;
         jeuFX.jouer();
     }
@@ -54,8 +56,8 @@ public class Jeu {
         new Sauvegarde().save(partie, nom);
     }
 
-    public Optional<Partie> load(String nom) throws IOException, ClassNotFoundException{
-        return new Sauvegarde().load(nom);
+    public Optional<Partie> load(File file) throws IOException, ClassNotFoundException{
+        return new Sauvegarde().load(file);
 
     }
 

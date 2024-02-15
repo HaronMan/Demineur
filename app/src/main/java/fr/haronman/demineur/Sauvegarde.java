@@ -13,7 +13,7 @@ import java.io.Serializable;
 import java.util.Optional;
 
 public class Sauvegarde implements Serializable{
-    private static final String CHEMIN_SAUVEGARDE = "C:\\Users\\hkoch\\Documents\\demineur_saves";
+    public static final String CHEMIN_SAUVEGARDE = "C:\\Users\\hkoch\\Documents\\demineur_saves";
 
     public Sauvegarde(){}
 
@@ -30,12 +30,12 @@ public class Sauvegarde implements Serializable{
         oos.close();
     }
 
-    public Optional<Partie> load(String nom) throws IOException, ClassNotFoundException{
+    public Optional<Partie> load(File fichier) throws IOException, ClassNotFoundException{
         // Chargement d'une partie dans un fichier
-        FileInputStream fis = new FileInputStream(Sauvegarde.CHEMIN_SAUVEGARDE+"\\"+nom+".save");
-        ObjectInputStream ois = new ObjectInputStream(fis);
-        ois.close();
-        return Optional.ofNullable((Partie) ois.readObject());
+        FileInputStream fis = new FileInputStream(fichier);
+        try(ObjectInputStream ois = new ObjectInputStream(fis)){
+            return Optional.ofNullable((Partie) ois.readObject());
+        }
     }
 
     public static void delete(String nom){

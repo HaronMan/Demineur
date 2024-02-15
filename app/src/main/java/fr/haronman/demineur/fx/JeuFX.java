@@ -1,8 +1,10 @@
 package fr.haronman.demineur.fx;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
+import fr.haronman.demineur.Sauvegarde;
 import fr.haronman.demineur.model.Difficulte;
 import fr.haronman.demineur.model.Jeu;
 import fr.haronman.demineur.model.Partie;
@@ -42,6 +44,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -104,8 +107,20 @@ public class JeuFX {
         sauvegarder.setOnAction(action -> {
             try {
                 NomSauvegardeFX sauvegardeFX = new NomSauvegardeFX();
-                sauvegardeFX.show();
-                jeu.save(jeu.getPartie(), sauvegardeFX.getNom());
+                if(jeu.getPartie().getNomSave() == null){
+                    sauvegardeFX.show();
+                    if(!sauvegardeFX.getNom().isEmpty()){
+                        jeu.save(jeu.getPartie(), sauvegardeFX.getNom().toLowerCase());
+                    }
+                }else{
+                    jeu.save(jeu.getPartie(), jeu.getPartie().getNomSave());
+                }
+                Alert confirmation = new Alert(AlertType.INFORMATION, 
+                    "La partie a bien été sauvegardée"
+                );
+                    confirmation.setTitle("Sauvegarde");
+                    confirmation.setHeaderText("Sauvegarde effectué");
+                    confirmation.showAndWait();
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
@@ -116,14 +131,26 @@ public class JeuFX {
         MenuItem charger = new MenuItem("Charger");
         charger.setOnAction(action -> {
             try {
-                Optional<Partie> loadPartie = jeu.load("Test");
+                FileChooser fc = new FileChooser();
+                fc.setTitle("Choississez une sauvegarde");
+                //Voir uniquement les fichiers .save
+                FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Sauvegardes", "*.save");
+                fc.getExtensionFilters().add(extFilter);
+                fc.setInitialDirectory(new File(Sauvegarde.CHEMIN_SAUVEGARDE));
+
+                File sauvegarde = fc.showOpenDialog(stage);
+                String nomFichier = sauvegarde.getName();
+                String nomSave = nomFichier.substring(0, nomFichier.lastIndexOf("."));
+
+                Optional<Partie> loadPartie = jeu.load(sauvegarde);
                 loadPartie.ifPresent(p -> {
                     try {
-                        jeu.start(p);
+                        jeu.start(p, nomSave);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                } );
+                });
+                
             } catch (Exception e) {
                 e.printStackTrace();
             }    
