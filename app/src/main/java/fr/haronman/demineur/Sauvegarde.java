@@ -38,19 +38,28 @@ public class Sauvegarde implements Serializable{
     }
 
     public static void delete(String nom){
-        // TODO Supprimer une partie après victoire
-    }
-
-    public static boolean nomDejaExistant(String nom){
         File[] fichiers = new File(CHEMIN_SAUVEGARDE).listFiles();
-        for(File f : fichiers){
-        }
         if(fichiers != null || fichiers.length > 0){
             for(File f : fichiers){
                 if(f.isFile() && f.getName().endsWith(".save")){
                     String nomFichier = f.getName();
                     nomFichier = nomFichier.substring(0, nomFichier.lastIndexOf("."));
-                    System.out.println(nomFichier);
+                    if(nomFichier.equals(nom)){
+                        f.delete();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    public static boolean nomDejaExistant(String nom){
+        File[] fichiers = new File(CHEMIN_SAUVEGARDE).listFiles();
+        if(fichiers != null || fichiers.length > 0){
+            for(File f : fichiers){
+                if(f.isFile() && f.getName().endsWith(".save")){
+                    String nomFichier = f.getName();
+                    nomFichier = nomFichier.substring(0, nomFichier.lastIndexOf("."));
                     if(nomFichier.equals(nom)){
                         return true;
                     }

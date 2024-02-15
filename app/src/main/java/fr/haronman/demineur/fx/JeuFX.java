@@ -617,6 +617,9 @@ public class JeuFX {
             }
             lignes.getChildren().add(col);
         }
+        if(jeu.getPartie().getNomSave() != null){
+            Sauvegarde.delete(jeu.getPartie().getNomSave());
+        }
         chrono.stop();
         show(lignes);
     }
