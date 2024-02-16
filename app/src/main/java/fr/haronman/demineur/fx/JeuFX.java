@@ -58,6 +58,7 @@ public class JeuFX {
     private Label timerFX;
     private Timeline chrono;
     private boolean mouseInsideBP;
+    private boolean pause;
 
     public JeuFX(Stage stage, Jeu jeu){
         this.jeu = jeu;
@@ -67,38 +68,14 @@ public class JeuFX {
         this.visage = new ImageView(Visage.IDLE.getImage());
         this.timerFX = new Label();
         timerFX.setFont(Font.font(20));
+        pause = false;
         initTimer();
-    }
-
-    public JeuFX(Stage stage, Jeu jeu, int secondes){
-        this.jeu = jeu;
-        this.stage = stage;
-        this.nbrDrapeauFX = new Label();
-        nbrDrapeauFX.setFont(Font.font(20));
-        this.visage = new ImageView(Visage.IDLE.getImage());
-        this.timerFX = new Label();
-        timerFX.setFont(Font.font(20));
-        initTimer(secondes);
     }
 
     public void initTimer(){
         chrono = new Timeline();
-        chrono.getKeyFrames().add(new KeyFrame(Duration.seconds(1), event -> {
-            jeu.getPartie().incrementSecondes();
-            try {
-                updateTimerFX();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }));
-        chrono.setCycleCount(Timeline.INDEFINITE);
-    }
-
-    public void initTimer(int secondes){
-        jeu.getPartie().setSecondes(secondes);
-        chrono = new Timeline();
-        chrono.getKeyFrames().add(new KeyFrame(Duration.seconds(1), event -> {
-            jeu.getPartie().incrementSecondes();
+        chrono.getKeyFrames().add(new KeyFrame(Duration.millis(1), event -> {
+            jeu.getPartie().incrementMillis();
             try {
                 updateTimerFX();
             } catch (Exception e) {
@@ -109,7 +86,6 @@ public class JeuFX {
     }
 
     public void jouer() throws Exception{
-        stage.setTitle("Démineur ["+jeu.getPartie().getDifficulte().getNom()+"]");
         show(AffichagePlateau());
     }
 
@@ -128,7 +104,6 @@ public class JeuFX {
         if(jeu.getFin()){
             sauvegarder.setDisable(true);
         }
-
         sauvegarder.setOnAction(action -> {
             try {
                 sauvegarder();
@@ -147,14 +122,26 @@ public class JeuFX {
             }
         });
 
+        MenuItem setPause = new MenuItem("Pause");
+        setPause.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN));
+        setPause.setOnAction(action -> {
+            if(!pause) {
+                pause();
+                setPause.setText("Reprendre");
+            }else{
+                reprendre();
+                setPause.setText("Pause");
+            }
+        });
+
+        SeparatorMenuItem ligne = new SeparatorMenuItem();
+
         MenuItem tableauScore = new MenuItem("Tableau des scores");
         tableauScore.setAccelerator(new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
         tableauScore.setOnAction(action -> {
             TableauScoreFX.show();
             System.err.println("Tableau des scores non implémenté");
         });
-
-        SeparatorMenuItem ligne = new SeparatorMenuItem();
 
         MenuItem quitter = new MenuItem("Quitter");
         quitter.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
@@ -200,7 +187,7 @@ public class JeuFX {
         Menu plus = new Menu("Plus");
         MenuItem regles = new MenuItem("Règles");
         
-        jeuBarre.getItems().addAll(sauvegarder, charger, tableauScore, ligne, quitter);
+        jeuBarre.getItems().addAll(sauvegarder, charger, setPause, ligne, tableauScore, quitter);
         choix_difficulte.getItems().addAll(facile, intermediaire, difficile, expert, impossible, hardcore);
         plus.getItems().addAll(regles);
 
@@ -238,7 +225,7 @@ public class JeuFX {
                 try {
                     updateVisage(Visage.IDLE);
                     chrono.stop();
-                    jeu.getPartie().setSecondes(0);
+                    jeu.getPartie().setMillis(0);
                     jeu.start(courant);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -290,6 +277,7 @@ public class JeuFX {
             stage.setScene(new Scene(root));
         }
 
+        stage.setTitle("Démineur ["+jeu.getPartie().getDifficulte().getNom()+"]");
         stage.getIcons().add(new Image("img/icon.png"));
         stage.sizeToScene();
         stage.setResizable(false);
@@ -333,11 +321,10 @@ public class JeuFX {
                 // Clic sur une case
                 bp.setOnMousePressed(event -> {
                     if(event.getButton() == MouseButton.PRIMARY){
-                        if(!c.getDecouvert() && !c.getDrapeau()){
+                        if(!c.getDecouvert() && !c.getDrapeau() && !pause){
                             try {
-                                updateVisage(Visage.ONCLICK);
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                                updateVisage(Visage.ONCLICK);                                } catch (Exception e) {
+                                    e.printStackTrace();
                             }
                             iv.setImage(c.onClickImage());
                         }
@@ -352,7 +339,7 @@ public class JeuFX {
                         }
                         if(mouseInsideBP){
                             //Lancement du minuteur
-                            if(jeu.getPartie().getPremierClic()){
+                            if(jeu.getPartie().getPremierClic() && !pause){
                                 jeu.getPartie().premierClicEffectue();
                                 chrono.play();
                                 if(c instanceof Mine){
@@ -365,7 +352,7 @@ public class JeuFX {
                                     iv.setImage(t.getImage());
                                     }
                                 }
-                            }if(!c.getDecouvert() && !c.getDrapeau()){ // Si on souhaite la découvrir
+                            }if(!c.getDecouvert() && !c.getDrapeau() && !pause){ // Si on souhaite la découvrir
                                 // Condtions : caché et pas de drapeau
                                 devoiler(c);
                                 iv.setImage(c.getImage());
@@ -376,16 +363,16 @@ public class JeuFX {
                     }
                 });
                 bp.setOnMouseClicked(event -> {
-                    if(jeu.getPartie().getPremierClic()){
+                    if(jeu.getPartie().getPremierClic() && !pause){
                         jeu.getPartie().premierClicEffectue();
                         chrono.play();
                     }
                     if(event.getButton() == MouseButton.SECONDARY) {
                         // Si on souhaite manipuler les drapeaux
-                        if(!c.getDecouvert()){
+                        if(!c.getDecouvert() && !pause){
                             if(!c.getDrapeau()){
                                 // Placer un drapeau
-                                if(jeu.getPartie().getNbrDrapeaux() > 0){
+                                if(jeu.getPartie().getNbrDrapeaux() > 0){                                        
                                     // Si il reste au moins un drapeau en stock
                                     c.insererDrapeau();
                                     jeu.getPartie().retirerDrapeaux();
@@ -405,7 +392,6 @@ public class JeuFX {
                 bp.setBorder(new Border(bs));
                 col.getChildren().add(bp);
             }
-
             lignes.getChildren().add(col);
         }
 
@@ -595,8 +581,13 @@ public class JeuFX {
     }
 
     public void updateTimerFX() throws Exception{
-        int m = 0, h = 0, s = jeu.getPartie().getSecondes();
+        int m = 0, h = 0, s = 0;
+        long ms = jeu.getPartie().getMillis();
         String text = "";
+        while(ms >= 1000){
+            s++;
+            ms -= 1000;
+        }
         while(s >= 60){
             m++;
             s -= 60;
@@ -609,6 +600,18 @@ public class JeuFX {
         text += (m > 0) ? m+"m" : "";
         text += s+"s";
         timerFX.setText(text);
+    }
+
+    public void pause(){
+        pause = true;
+        chrono.stop();
+        plateauFX.setOpacity(.2);
+    }
+
+    public void reprendre(){
+        pause = false;
+        plateauFX.setOpacity(1);
+        chrono.play();
     }
 
     public void sauvegarder() throws ClassNotFoundException, IOException{
