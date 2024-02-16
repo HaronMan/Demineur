@@ -1,5 +1,7 @@
 package fr.haronman.demineur.fx;
 
+import java.io.IOException;
+
 import fr.haronman.demineur.Sauvegarde;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -62,11 +64,15 @@ public class NomSauvegardeFX {
         
 
         valider.setOnMouseClicked(event -> {
-            if(Sauvegarde.nomDejaExistant(inputNom.getText().toLowerCase())){
-                message.setVisible(true);
-            }else{
-                nom = inputNom.getText();
-                stage.close();
+            try {
+                if(Sauvegarde.nomDejaExistant(inputNom.getText().toLowerCase())){
+                    message.setVisible(true);
+                }else{
+                    nom = inputNom.getText();
+                    stage.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
         Button annuler = new Button("Annuler");
