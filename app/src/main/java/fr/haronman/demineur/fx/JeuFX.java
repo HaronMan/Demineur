@@ -29,6 +29,8 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Background;
@@ -192,6 +194,7 @@ public class JeuFX {
         });
 
         MenuItem tableauScore = new MenuItem("Tableau des scores");
+        tableauScore.setAccelerator(new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
         tableauScore.setOnAction(action -> {
             TableauScoreFX.show();
             System.err.println("Tableau des scores non implémenté");
@@ -239,11 +242,15 @@ public class JeuFX {
                 }
             }
         );
+
+        Menu plus = new Menu("Plus");
+        MenuItem regles = new MenuItem("Règles");
         
+        jeuBarre.getItems().addAll(sauvegarder, charger, tableauScore, ligne, quitter);
         choix_difficulte.getItems().addAll(facile, intermediaire, difficile, expert, impossible, hardcore);
         jeuBarre.getItems().addAll(sauvegarder, charger, tableauScore, ligne, quitter);
 
-        barre.getMenus().addAll(jeuBarre, choix_difficulte);
+        barre.getMenus().addAll(jeuBarre, choix_difficulte, plus);
 
         root.getChildren().add(barre);
 
