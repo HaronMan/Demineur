@@ -25,7 +25,6 @@ public class Jeu {
     public void start(Partie partie) throws Exception{
         this.partie = partie;
         fin = false;
-        partie.setSecondes(partie.getSecondes());
         jeuFX.jouer();
     }
 
