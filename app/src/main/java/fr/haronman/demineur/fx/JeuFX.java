@@ -31,7 +31,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -125,72 +124,27 @@ public class JeuFX {
         Menu jeuBarre = new Menu("Jeu");
 
         MenuItem sauvegarder = new MenuItem("Sauvegarder");
+        sauvegarder.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
         if(jeu.getFin()){
             sauvegarder.setDisable(true);
         }
 
         sauvegarder.setOnAction(action -> {
             try {
-                chrono.stop();
-                NomSauvegardeFX sauvegardeFX = new NomSauvegardeFX();
-                if(jeu.getPartie().getNomSave() == null){
-                    sauvegardeFX.show();
-                    if(sauvegardeFX.getNom() != null){
-                        jeu.getPartie().setNomSave(sauvegardeFX.getNom().toLowerCase());
-                        jeu.save(jeu.getPartie());
-
-                        Alert confirmation = new Alert(AlertType.INFORMATION, 
-                    "La partie a bien été sauvegardée"
-                        );
-                        confirmation.setTitle("Sauvegarde");
-                        confirmation.setHeaderText("Sauvegarde effectué");
-                        confirmation.showAndWait();
-                    }
-                }else{
-                    jeu.save(jeu.getPartie());
-                    Alert confirmation = new Alert(AlertType.INFORMATION, 
-                    "La partie a bien été sauvegardée"
-                        );
-                    confirmation.setTitle("Sauvegarde");
-                    confirmation.setHeaderText("Sauvegarde effectué");
-                    confirmation.showAndWait();
-                }
-                chrono.play();
-            } catch (IOException e) {
+                sauvegarder();
+            } catch (ClassNotFoundException | IOException e) {
                 e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }    
+            }
         });
 
         MenuItem charger = new MenuItem("Charger");
+        charger.setAccelerator(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN));
         charger.setOnAction(action -> {
             try {
-                chrono.stop();
-                FileChooser fc = new FileChooser();
-                fc.setTitle("Choississez une sauvegarde");
-                //Voir uniquement les fichiers .save
-                FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Sauvegardes", "*.save");
-                fc.getExtensionFilters().add(extFilter);
-                fc.setInitialDirectory(new File(Sauvegarde.CHEMIN_SAUVEGARDE));
-
-                File sauvegarde = fc.showOpenDialog(stage);
-                if(sauvegarde != null){
-                    Optional<Partie> loadPartie = jeu.load(sauvegarde);
-                    loadPartie.ifPresent(p -> {
-                        try {
-                            jeu.start(p);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    });
-                }else{
-                    chrono.play();
-                }
-                
-            } catch (Exception e) {
+                charger();
+            } catch (ClassNotFoundException | IOException e) {
                 e.printStackTrace();
-            }    
+            }
         });
 
         MenuItem tableauScore = new MenuItem("Tableau des scores");
@@ -198,12 +152,12 @@ public class JeuFX {
         tableauScore.setOnAction(action -> {
             TableauScoreFX.show();
             System.err.println("Tableau des scores non implémenté");
-            //TODO Tableau des scores
         });
 
         SeparatorMenuItem ligne = new SeparatorMenuItem();
 
         MenuItem quitter = new MenuItem("Quitter");
+        quitter.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
         quitter.setOnAction(action -> {
             stage.close();
         });
@@ -248,7 +202,7 @@ public class JeuFX {
         
         jeuBarre.getItems().addAll(sauvegarder, charger, tableauScore, ligne, quitter);
         choix_difficulte.getItems().addAll(facile, intermediaire, difficile, expert, impossible, hardcore);
-        jeuBarre.getItems().addAll(sauvegarder, charger, tableauScore, ligne, quitter);
+        plus.getItems().addAll(regles);
 
         barre.getMenus().addAll(jeuBarre, choix_difficulte, plus);
 
@@ -335,14 +289,6 @@ public class JeuFX {
         }else{
             stage.setScene(new Scene(root));
         }
-
-        stage.getScene().setOnKeyPressed(event -> {
-            try {
-                interactionClavier(event);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
 
         stage.getIcons().add(new Image("img/icon.png"));
         stage.sizeToScene();
@@ -665,15 +611,55 @@ public class JeuFX {
         timerFX.setText(text);
     }
 
-    public void interactionClavier(KeyEvent keyEvent) throws Exception{
-        if(keyEvent.getCode() == KeyCode.R){
-            if(!jeu.getPartie().getPremierClic()){
-                Difficulte courant = jeu.getPartie().getDifficulte();
-                updateVisage(Visage.IDLE);
-                chrono.stop();
-                jeu.getPartie().setSecondes(0);
-                jeu.start(courant);
+    public void sauvegarder() throws ClassNotFoundException, IOException{
+        chrono.stop();
+        NomSauvegardeFX sauvegardeFX = new NomSauvegardeFX();
+        if(jeu.getPartie().getNomSave() == null){
+            sauvegardeFX.show();
+            if(sauvegardeFX.getNom() != null){
+                jeu.getPartie().setNomSave(sauvegardeFX.getNom().toLowerCase());
+                jeu.save(jeu.getPartie());
+
+                Alert confirmation = new Alert(AlertType.INFORMATION, 
+            "La partie a bien été sauvegardée"
+                );
+                confirmation.setTitle("Sauvegarde");
+                confirmation.setHeaderText("Sauvegarde effectué");
+                confirmation.showAndWait();
             }
+        }else{
+            jeu.save(jeu.getPartie());
+            Alert confirmation = new Alert(AlertType.INFORMATION, 
+            "La partie a bien été sauvegardée"
+                );
+            confirmation.setTitle("Sauvegarde");
+            confirmation.setHeaderText("Sauvegarde effectué");
+            confirmation.showAndWait();
+        }
+        chrono.play();
+    }
+
+    public void charger() throws ClassNotFoundException, IOException{
+        chrono.stop();
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Choississez une sauvegarde");
+        //Voir uniquement les fichiers .save
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Sauvegardes", "*.save");
+        fc.getExtensionFilters().add(extFilter);
+        fc.setInitialDirectory(new File(Sauvegarde.CHEMIN_SAUVEGARDE));
+
+        File sauvegarde = fc.showOpenDialog(stage);
+        if(sauvegarde != null){
+            Optional<Partie> loadPartie = jeu.load(sauvegarde);
+            loadPartie.ifPresent(p -> {
+                try {
+                    jeu.start(p);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        }else{
+            chrono.play();
         }
     }
 }
