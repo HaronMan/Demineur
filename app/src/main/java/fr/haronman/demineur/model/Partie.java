@@ -17,7 +17,7 @@ public class Partie implements Serializable{
     private int cases_restantes;
     private boolean premier_clic;
     private final Difficulte difficulte;
-    private int secondes;
+    private long millis;
     
     public Partie(Difficulte difficulte){
         this.difficulte = difficulte;
@@ -133,15 +133,15 @@ public class Partie implements Serializable{
         premier_clic = false;
     }
 
-    public int getSecondes() {
-        return secondes;
+    public long getMillis() {
+        return millis;
     }
 
-    public void setSecondes(int secondes) {
-        this.secondes = secondes;
+    public void setMillis(long millis) {
+        this.millis = millis;
     }
 
-    public void incrementSecondes(){
-        secondes++;
+    public void incrementMillis(){
+        millis++;
     }
 }

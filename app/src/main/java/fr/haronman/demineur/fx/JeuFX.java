@@ -57,7 +57,6 @@ public class JeuFX {
     private ImageView visage;
     private Label timerFX;
     private Timeline chrono;
-    private int millis;
     private boolean mouseInsideBP;
     private boolean pause;
 
@@ -76,11 +75,7 @@ public class JeuFX {
     public void initTimer(){
         chrono = new Timeline();
         chrono.getKeyFrames().add(new KeyFrame(Duration.millis(1), event -> {
-            millis++;
-            if(millis == 1000){
-                jeu.getPartie().incrementSecondes();
-                millis = 0;
-            }
+            jeu.getPartie().incrementMillis();
             try {
                 updateTimerFX();
             } catch (Exception e) {
@@ -230,7 +225,7 @@ public class JeuFX {
                 try {
                     updateVisage(Visage.IDLE);
                     chrono.stop();
-                    jeu.getPartie().setSecondes(0);
+                    jeu.getPartie().setMillis(0);
                     jeu.start(courant);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -586,8 +581,13 @@ public class JeuFX {
     }
 
     public void updateTimerFX() throws Exception{
-        int m = 0, h = 0, s = jeu.getPartie().getSecondes();
+        int m = 0, h = 0, s = 0;
+        long ms = jeu.getPartie().getMillis();
         String text = "";
+        while(ms >= 1000){
+            s++;
+            ms -= 1000;
+        }
         while(s >= 60){
             m++;
             s -= 60;
