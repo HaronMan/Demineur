@@ -125,12 +125,14 @@ public class JeuFX {
         MenuItem setPause = new MenuItem("Pause");
         setPause.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN));
         setPause.setOnAction(action -> {
-            if(!pause) {
-                pause();
-                setPause.setText("Reprendre");
-            }else{
-                reprendre();
-                setPause.setText("Pause");
+            if(!jeu.getFin()){
+                if(!pause) {
+                    pause();
+                    setPause.setText("Reprendre");
+                }else{
+                    reprendre();
+                    setPause.setText("Pause");
+                }
             }
         });
 
@@ -157,13 +159,15 @@ public class JeuFX {
         RadioMenuItem difficile = new RadioMenuItem("Difficile"); difficile.setId("2");
         RadioMenuItem expert = new RadioMenuItem("Expert"); expert.setId("3");
         RadioMenuItem impossible = new RadioMenuItem("Impossible"); impossible.setId("4");
-        RadioMenuItem hardcore = new RadioMenuItem("HARDCORE"); hardcore.setId("5");
+        RadioMenuItem hardcore = new RadioMenuItem("Hardcore"); hardcore.setId("5");
+        RadioMenuItem diabolique = new RadioMenuItem("Diabolique"); diabolique.setId("6");
         facile.setToggleGroup(tg);
         intermediaire.setToggleGroup(tg);
         difficile.setToggleGroup(tg);
         expert.setToggleGroup(tg);
         impossible.setToggleGroup(tg);
         hardcore.setToggleGroup(tg);
+        diabolique.setToggleGroup(tg);
         tg.getToggles().get(jeu.getPartie().getDifficulte().getId()).setSelected(true);
 
         tg.selectedToggleProperty().addListener(
@@ -188,7 +192,7 @@ public class JeuFX {
         MenuItem regles = new MenuItem("Règles");
         
         jeuBarre.getItems().addAll(sauvegarder, charger, setPause, ligne, tableauScore, quitter);
-        choix_difficulte.getItems().addAll(facile, intermediaire, difficile, expert, impossible, hardcore);
+        choix_difficulte.getItems().addAll(facile, intermediaire, difficile, expert, impossible, hardcore, diabolique);
         plus.getItems().addAll(regles);
 
         barre.getMenus().addAll(jeuBarre, choix_difficulte, plus);

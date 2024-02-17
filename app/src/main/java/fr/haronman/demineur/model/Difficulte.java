@@ -8,7 +8,8 @@ public enum Difficulte {
     DIFFICILE(2, "Difficile", 16, 31, 99),
     EXPERT(3, "Expert", 30, 50, 300),
     IMPOSSIBLE(4, "Impossible", 75, 80, 1000),
-    HARDCORE(5, "HARDCORE", 100, 150, 3000);
+    HARDCORE(5, "Hardcore", 100, 150, 3000),
+    DIABOLIQUE(6, "Diabolique", 200, 300, 12000);
 
     private final int id;
     private final String nom;

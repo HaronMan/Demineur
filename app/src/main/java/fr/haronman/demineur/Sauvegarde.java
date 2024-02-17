@@ -55,7 +55,7 @@ public class Sauvegarde implements Serializable{
             dossier.mkdirs();
         }else{
             File[] fichiers = new File(CHEMIN_SAUVEGARDE).listFiles();
-            if(fichiers != null || fichiers.length > 0){
+            if(fichiers != null && fichiers.length > 0){
                 for(File f : fichiers){
                     if(f.isFile() && f.getName().endsWith(".save")){
                         String nomFichier = f.getName();
@@ -78,7 +78,7 @@ public class Sauvegarde implements Serializable{
             return false;
         }else{
             File[] fichiers = new File(CHEMIN_SAUVEGARDE).listFiles();
-            if(fichiers != null || fichiers.length > 0){
+            if(fichiers != null && fichiers.length > 0){
                 for(File f : fichiers){
                     if(f.isFile() && f.getName().endsWith(".save")){
                         String nomFichier = f.getName();
