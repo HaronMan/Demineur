@@ -1,4 +1,4 @@
-package fr.haronman.demineur.controller;
+package fr.haronman.demineur.controller.jeu;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

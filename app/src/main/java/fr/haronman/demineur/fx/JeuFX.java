@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import fr.haronman.demineur.Sauvegarde;
+import fr.haronman.demineur.controller.jeu.MenuController;
 import fr.haronman.demineur.model.Difficulte;
 import fr.haronman.demineur.model.Jeu;
 import fr.haronman.demineur.model.Partie;
@@ -13,8 +14,6 @@ import fr.haronman.demineur.model.Plateau.Case.Mine;
 import fr.haronman.demineur.model.Plateau.Case.Terrain;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -54,6 +53,7 @@ import javafx.util.Duration;
 
 public class JeuFX {
     private Jeu jeu;
+    private MenuBar menuBarre;
     private VBox plateauFX;
     private Stage stage;
     private Label nbrDrapeauFX;
@@ -66,6 +66,7 @@ public class JeuFX {
     public JeuFX(Stage stage, Jeu jeu){
         this.jeu = jeu;
         this.stage = stage;
+        this.menuBarre = new MenuBar();
         this.nbrDrapeauFX = new Label();
         nbrDrapeauFX.setFont(Font.font(20));
         this.visage = new ImageView(Visage.IDLE.getImage());
@@ -73,19 +74,6 @@ public class JeuFX {
         timerFX.setFont(Font.font(20));
         pause = false;
         initTimer();
-    }
-
-    public void initTimer(){
-        chrono = new Timeline();
-        chrono.getKeyFrames().add(new KeyFrame(Duration.millis(1), event -> {
-            jeu.getPartie().incrementMillis();
-            try {
-                updateTimerFX();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }));
-        chrono.setCycleCount(Timeline.INDEFINITE);
     }
 
     public void jouer() throws Exception{
@@ -97,112 +85,10 @@ public class JeuFX {
         updateTimerFX();
         StackPane root = new StackPane();
 
-        MenuBar barre = new MenuBar();
-        StackPane.setAlignment(barre, Pos.TOP_CENTER);
-        
-        Menu jeuBarre = new Menu("Jeu");
+        createMenuBarre();
 
-        MenuItem sauvegarder = new MenuItem("Sauvegarder");
-        sauvegarder.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
-        if(jeu.getFin()){
-            sauvegarder.setDisable(true);
-        }
-        sauvegarder.setOnAction(action -> {
-            try {
-                sauvegarder();
-            } catch (ClassNotFoundException | IOException e) {
-                e.printStackTrace();
-            }
-        });
-
-        MenuItem charger = new MenuItem("Charger");
-        charger.setAccelerator(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN));
-        charger.setOnAction(action -> {
-            try {
-                charger();
-            } catch (ClassNotFoundException | IOException e) {
-                e.printStackTrace();
-            }
-        });
-
-        MenuItem setPause = new MenuItem("Pause");
-        setPause.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN));
-        setPause.setOnAction(action -> {
-            if(!jeu.getFin()){
-                if(!pause) {
-                    pause();
-                    setPause.setText("Reprendre");
-                }else{
-                    reprendre();
-                    setPause.setText("Pause");
-                }
-            }
-        });
-
-        SeparatorMenuItem ligne = new SeparatorMenuItem();
-
-        MenuItem tableauScore = new MenuItem("Tableau des scores");
-        tableauScore.setAccelerator(new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
-        tableauScore.setOnAction(action -> {
-            TableauScoreFX.show();
-            System.err.println("Tableau des scores non implémenté");
-        });
-
-        MenuItem quitter = new MenuItem("Quitter");
-        quitter.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
-        quitter.setOnAction(action -> {
-            stage.close();
-        });
-
-        // Choix difficulté
-        Menu choix_difficulte = new Menu("Difficulté");
-        ToggleGroup tg = new ToggleGroup();
-        RadioMenuItem facile = new RadioMenuItem("Facile"); facile.setId("0");
-        RadioMenuItem intermediaire = new RadioMenuItem("Intermediaire"); intermediaire.setId("1");
-        RadioMenuItem difficile = new RadioMenuItem("Difficile"); difficile.setId("2");
-        RadioMenuItem expert = new RadioMenuItem("Expert"); expert.setId("3");
-        RadioMenuItem impossible = new RadioMenuItem("Impossible"); impossible.setId("4");
-        RadioMenuItem hardcore = new RadioMenuItem("Hardcore"); hardcore.setId("5");
-        RadioMenuItem diabolique = new RadioMenuItem("Diabolique"); diabolique.setId("6");
-        facile.setToggleGroup(tg);
-        intermediaire.setToggleGroup(tg);
-        difficile.setToggleGroup(tg);
-        expert.setToggleGroup(tg);
-        impossible.setToggleGroup(tg);
-        hardcore.setToggleGroup(tg);
-        diabolique.setToggleGroup(tg);
-        tg.getToggles().get(jeu.getPartie().getDifficulte().getId()).setSelected(true);
-
-        tg.selectedToggleProperty().addListener(
-            (obs, oldT, newT) -> {
-                if(newT != null){
-                    RadioMenuItem rmi = (RadioMenuItem) newT;
-                    Optional<Difficulte> d = Difficulte.getById(Integer.valueOf(rmi.getId()));
-                    if(d.isPresent()){
-                        try {
-                            updateVisage(Visage.IDLE);
-                            chrono.stop();
-                            jeu.start(d.get());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        );
-
-        Menu plus = new Menu("Plus");
-        MenuItem regles = new MenuItem("Règles");
-        
-        jeuBarre.getItems().addAll(sauvegarder, charger, setPause, ligne, tableauScore, quitter);
-        choix_difficulte.getItems().addAll(facile, intermediaire, difficile, expert, impossible, hardcore, diabolique);
-        plus.getItems().addAll(regles);
-
-        barre.getMenus().addAll(jeuBarre, choix_difficulte, plus);
-
-        root.getChildren().add(barre);
-
-       
+        root.getChildren().add(menuBarre);
+        StackPane.setAlignment(menuBarre, Pos.TOP_CENTER);
 
         VBox affichageJeu = new VBox();
 
@@ -601,16 +487,113 @@ public class JeuFX {
         timerFX.setText(text);
     }
 
-    public void pause(){
-        pause = true;
-        chrono.stop();
-        plateauFX.setOpacity(.2);
+    public void initTimer(){
+        chrono = new Timeline();
+        chrono.getKeyFrames().add(new KeyFrame(Duration.millis(1), event -> {
+            jeu.getPartie().incrementMillis();
+            try {
+                updateTimerFX();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }));
+        chrono.setCycleCount(Timeline.INDEFINITE);
     }
 
-    public void reprendre(){
-        pause = false;
-        plateauFX.setOpacity(1);
-        chrono.play();
+    public void createMenuBarre(){
+        Menu jeuBarre = new Menu("Jeu");
+
+        MenuItem sauvegarder = new MenuItem("Sauvegarder");
+        sauvegarder.setId("save");
+        sauvegarder.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
+        if(jeu.getFin()){
+            sauvegarder.setDisable(true);
+        }
+        sauvegarder.setOnAction(action -> {
+            try {
+                sauvegarder();
+            } catch (ClassNotFoundException | IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        MenuItem charger = new MenuItem("Charger");
+        charger.setId("load");
+        charger.setAccelerator(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN));
+        charger.setOnAction(action -> {
+            try {
+                charger();
+            } catch (ClassNotFoundException | IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        MenuItem setPause = new MenuItem("Pause / Reprendre");
+        setPause.setId("pause");
+        setPause.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN));
+        setPause.setOnAction(new MenuController(this));
+
+        SeparatorMenuItem ligne = new SeparatorMenuItem();
+
+        MenuItem tableauScore = new MenuItem("Tableau des scores");
+        tableauScore.setId("tabScore");
+        tableauScore.setAccelerator(new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
+        tableauScore.setOnAction(action -> {
+            TableauScoreFX.show();
+            System.err.println("Tableau des scores non implémenté");
+        });
+
+        MenuItem quitter = new MenuItem("Quitter");
+        quitter.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
+        quitter.setOnAction(action -> {
+            stage.close();
+        });
+
+        // Choix difficulté
+        Menu choix_difficulte = new Menu("Difficulté");
+        ToggleGroup tg = new ToggleGroup();
+        RadioMenuItem facile = new RadioMenuItem("Facile"); facile.setId("0");
+        RadioMenuItem intermediaire = new RadioMenuItem("Intermediaire"); intermediaire.setId("1");
+        RadioMenuItem difficile = new RadioMenuItem("Difficile"); difficile.setId("2");
+        RadioMenuItem expert = new RadioMenuItem("Expert"); expert.setId("3");
+        RadioMenuItem impossible = new RadioMenuItem("Impossible"); impossible.setId("4");
+        RadioMenuItem hardcore = new RadioMenuItem("Hardcore"); hardcore.setId("5");
+        RadioMenuItem diabolique = new RadioMenuItem("Diabolique"); diabolique.setId("6");
+        facile.setToggleGroup(tg);
+        intermediaire.setToggleGroup(tg);
+        difficile.setToggleGroup(tg);
+        expert.setToggleGroup(tg);
+        impossible.setToggleGroup(tg);
+        hardcore.setToggleGroup(tg);
+        diabolique.setToggleGroup(tg);
+        tg.getToggles().get(jeu.getPartie().getDifficulte().getId()).setSelected(true);
+
+        tg.selectedToggleProperty().addListener(
+            (obs, oldT, newT) -> {
+                if(newT != null){
+                    RadioMenuItem rmi = (RadioMenuItem) newT;
+                    Optional<Difficulte> d = Difficulte.getById(Integer.valueOf(rmi.getId()));
+                    if(d.isPresent()){
+                        try {
+                            updateVisage(Visage.IDLE);
+                            chrono.stop();
+                            jeu.start(d.get());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        );
+
+        Menu plus = new Menu("Plus");
+        MenuItem regles = new MenuItem("Règles");
+        
+        jeuBarre.getItems().addAll(sauvegarder, charger, setPause, ligne, tableauScore, quitter);
+        choix_difficulte.getItems().addAll(facile, intermediaire, difficile, expert, impossible, hardcore, diabolique);
+        plus.getItems().addAll(regles);
+
+        menuBarre.getMenus().addAll(jeuBarre, choix_difficulte, plus);
     }
 
     public void sauvegarder() throws ClassNotFoundException, IOException{
@@ -641,7 +624,7 @@ public class JeuFX {
         chrono.play();
     }
 
-    public void charger() throws ClassNotFoundException, IOException{
+    private void charger() throws ClassNotFoundException, IOException{
         chrono.stop();
         FileChooser fc = new FileChooser();
         fc.setTitle("Choississez une sauvegarde");
@@ -663,5 +646,45 @@ public class JeuFX {
         }else{
             chrono.play();
         }
+    }
+
+    public Jeu getJeu() {
+        return jeu;
+    }
+
+    public Timeline getChrono() {
+        return chrono;
+    }
+
+    public Label getNbrDrapeauFX() {
+        return nbrDrapeauFX;
+    }
+
+    public MenuBar getMenuBarre() {
+        return menuBarre;
+    }
+
+    public VBox getPlateauFX() {
+        return plateauFX;
+    }
+
+    public Stage getStage() {
+        return stage;
+    }
+
+    public Label getTimerFX() {
+        return timerFX;
+    }
+
+    public ImageView getVisage() {
+        return visage;
+    }
+
+    public boolean getPause(){
+        return pause;
+    }
+
+    public void setPause(boolean pause) {
+        this.pause = pause;
     }
 }
