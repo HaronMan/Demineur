@@ -509,13 +509,7 @@ public class JeuFX {
         if(jeu.getFin()){
             sauvegarder.setDisable(true);
         }
-        sauvegarder.setOnAction(action -> {
-            try {
-                sauvegarder();
-            } catch (ClassNotFoundException | IOException e) {
-                e.printStackTrace();
-            }
-        });
+        sauvegarder.setOnAction(new MenuController(this));
 
         MenuItem charger = new MenuItem("Charger");
         charger.setId("load");
@@ -594,34 +588,6 @@ public class JeuFX {
         plus.getItems().addAll(regles);
 
         menuBarre.getMenus().addAll(jeuBarre, choix_difficulte, plus);
-    }
-
-    public void sauvegarder() throws ClassNotFoundException, IOException{
-        chrono.stop();
-        NomSauvegardeFX sauvegardeFX = new NomSauvegardeFX();
-        if(jeu.getPartie().getNomSave() == null){
-            sauvegardeFX.show();
-            if(sauvegardeFX.getNom() != null){
-                jeu.getPartie().setNomSave(sauvegardeFX.getNom().toLowerCase());
-                jeu.save(jeu.getPartie());
-
-                Alert confirmation = new Alert(AlertType.INFORMATION, 
-            "La partie a bien été sauvegardée"
-                );
-                confirmation.setTitle("Sauvegarde");
-                confirmation.setHeaderText("Sauvegarde effectué");
-                confirmation.showAndWait();
-            }
-        }else{
-            jeu.save(jeu.getPartie());
-            Alert confirmation = new Alert(AlertType.INFORMATION, 
-            "La partie a bien été sauvegardée"
-                );
-            confirmation.setTitle("Sauvegarde");
-            confirmation.setHeaderText("Sauvegarde effectué");
-            confirmation.showAndWait();
-        }
-        chrono.play();
     }
 
     private void charger() throws ClassNotFoundException, IOException{
