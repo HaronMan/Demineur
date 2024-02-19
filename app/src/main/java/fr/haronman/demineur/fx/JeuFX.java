@@ -13,6 +13,8 @@ import fr.haronman.demineur.model.Plateau.Case.Mine;
 import fr.haronman.demineur.model.Plateau.Case.Terrain;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -41,6 +43,7 @@ import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -208,10 +211,6 @@ public class JeuFX {
         );
         StackPane.setMargin(affichageJeu, new Insets(10));
 
-        HBox infos = new HBox();
-        infos.setAlignment(Pos.CENTER);
-        infos.setPadding(new Insets(20, 0, 10, 0));
-
         // Compteur de drapeaux
         HBox drapeaux = new HBox();
         updateDrapeauxFX();
@@ -237,26 +236,22 @@ public class JeuFX {
             }
         });
         img.getChildren().add(visage);
-        
-        int esapacement = 0;
-        switch (jeu.getPartie().getDifficulte().getId()) {
-            case 0: esapacement = 80; break;
-            case 1: esapacement = 180; break;
-            case 2: esapacement = 450; break;
-            case 3: esapacement = 420; break;
-            case 4: esapacement = 550; break;
-            case 5: esapacement = 1100; break;
-            default: break;
-        }
-        HBox.setMargin(drapeaux, new Insets(0, esapacement, 0, 0));
-        HBox.setMargin(timerFX, new Insets(0, 0, 0, esapacement));
+
+        HBox infos = new HBox();
+        infos.setPadding(new Insets(20, 0, 10, 0));
+        infos.setPrefWidth(HBox.USE_COMPUTED_SIZE);
+
+        HBox.setHgrow(drapeaux, Priority.ALWAYS);
+        HBox.setHgrow(img, Priority.ALWAYS);
+        HBox.setHgrow(timerFX, Priority.ALWAYS);
 
         infos.getChildren().addAll(
             drapeaux,
             img,
             timerFX
         );
-
+        infos.setAlignment(Pos.CENTER);
+        
         StackPane.setMargin(infos, new Insets(10));
 
         plateauFX = partie;
