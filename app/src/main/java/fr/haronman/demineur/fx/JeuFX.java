@@ -276,9 +276,8 @@ public class JeuFX {
                     new BorderWidths(1)
                 );
 
-                PlateauController pc = new PlateauController(c, iv, this);
-
                 if(!jeu.getFin()){
+                    PlateauController pc = new PlateauController(c, iv, this);
                     bp.setOnMouseEntered(pc);
                     bp.setOnMouseExited(pc);
                     bp.setOnMousePressed(pc);
@@ -303,7 +302,7 @@ public class JeuFX {
             try {
                 jeu.setFin(true);
                 updateVisage(Visage.LOSE);
-                defaite(m);
+                defaite();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -380,50 +379,21 @@ public class JeuFX {
         }
     }
 
-    public void defaite(Mine touchee) throws Exception{
+    public void defaite() throws Exception{
+        chrono.stop();
         jeu.getPartie().devoilerMines();
         jeu.getPartie().devoilerFauxDrapeaux();
-        VBox lignes = new VBox();
-
-        Case[][] mat = jeu.getPartie().getMatricePlateau();
-
-        for(int row = 0; row < mat.length; row++){
-            HBox col = new HBox();
-            for(int column = 0; column < mat[row].length; column++){
-                ImageView iv = new ImageView();
-                if(jeu.getPartie().getDifficulte().getId() == 3){
-                    iv.setFitWidth(20);
-                    iv.setFitHeight(20);
-                } else if(jeu.getPartie().getDifficulte().getId() >= 4){
-                    iv.setFitWidth(15);
-                    iv.setFitHeight(15);
-                }
-
-                Case c = jeu.getPartie().getCaseMatrice(row, column);
-                iv.setImage(c.getImage());
-                // Création d'une bordure gros pour bien distinguer les cases
-                BorderPane bp = new BorderPane(iv);
-                BorderStroke bs = new BorderStroke(
-                    Color.GREY, 
-                    BorderStrokeStyle.SOLID, 
-                    CornerRadii.EMPTY, 
-                    new BorderWidths(1, 1, 1, 1)
-                );
-    
-                bp.setBorder(new Border(bs));
-                col.getChildren().add(bp);
-            }
-            lignes.getChildren().add(col);
-        }
-        chrono.stop();
+        VBox lignes = AffichagePlateau();
         show(lignes);
     }
 
     public void victoire() throws Exception{
+        chrono.stop();
         if(jeu.getPartie().getNomSave() != null){
             Sauvegarde.delete(jeu.getPartie().getNomSave());
         }
-        chrono.stop();
+        VBox lignes = AffichagePlateau();
+        show(lignes);
     }
 
     public void updateDrapeauxFX(){
