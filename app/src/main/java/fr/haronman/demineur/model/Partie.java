@@ -142,6 +142,6 @@ public class Partie implements Serializable{
     }
 
     public void incrementMillis(){
-        millis+=1000;
+        millis+=1;
     }
 }
