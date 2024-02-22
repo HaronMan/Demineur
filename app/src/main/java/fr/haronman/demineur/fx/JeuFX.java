@@ -47,16 +47,34 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+/**
+ * Classe permettant de gerer l'affichage du jeu et du plateau
+ * * Plateau = Cases à cliquer pour jouer
+ * @author HaronMan
+ */
 public class JeuFX {
+    // Jeu (modele)
     private Jeu jeu;
+    // Plateau de jeu
     private VBox plateauFX;
+    // Fenêtre d'affichage
     private Stage stage;
+    // Texte affichant le nombre de drapeaux restant
     private Label nbrDrapeauFX;
+    // Visage (en haut au centre)
     private ImageView visage;
+    // Texte affichant le chronomètre
     private Label timerFX;
+    // Chronomètre
     private Timeline chrono;
+    // Définit si le jeu est en pause ou non
     private boolean pause;
 
+    /**
+     * Constructeur
+     * @param stage Fenêtre du jeu
+     * @param jeu Jeu (modèle)
+     */
     public JeuFX(Stage stage, Jeu jeu){
         this.jeu = jeu;
         this.stage = stage;
@@ -69,16 +87,27 @@ public class JeuFX {
         initTimer();
     }
 
+    /**
+     * Lancement du jeu (affichage)
+     * @throws Exception
+     */
     public void jouer() throws Exception{
         show(AffichagePlateau());
     }
 
-    public void show(VBox partie) throws Exception{
+    /**
+     * Affichage de la fenêtre de jeu avec le plateau en paramètre
+     * @param partie Plateau à afficher
+     * @throws Exception
+     */
+    private void show(VBox partie) throws Exception{
         updateTimerFX();
         StackPane root = new StackPane();
 
+        // Barre de menu
         MenuBar menuBarre = new MenuBar();
 
+        // Première colonne (Jeu)
         Menu jeuBarre = new Menu("Jeu");
 
         MenuItem sauvegarder = new MenuItem("Sauvegarder");
@@ -120,7 +149,7 @@ public class JeuFX {
             stage.close();
         });
 
-        // Choix difficulté
+        // Deuxième colonne (Choix difficulté)
         Menu choix_difficulte = new Menu("Difficulté");
         ToggleGroup tg = new ToggleGroup();
         RadioMenuItem facile = new RadioMenuItem("Facile"); facile.setId("0");
@@ -157,6 +186,7 @@ public class JeuFX {
             }
         );
 
+        // TODO Troisième colonne
         Menu plus = new Menu("Plus");
         MenuItem regles = new MenuItem("Règles");
         
@@ -248,6 +278,10 @@ public class JeuFX {
         stage.show();
     }
 
+    /**
+     * Affichage du plateau du jeu
+     * @return VBox stockant le plateau du jeu
+     */
     public VBox AffichagePlateau(){
         VBox lignes = new VBox();
 
@@ -276,9 +310,9 @@ public class JeuFX {
                     new BorderWidths(1)
                 );
 
-                PlateauController pc = new PlateauController(c, iv, this);
-
                 if(!jeu.getFin()){
+                    // Gestion du controller si jeu non fini
+                    PlateauController pc = new PlateauController(c, iv, this);
                     bp.setOnMouseEntered(pc);
                     bp.setOnMouseExited(pc);
                     bp.setOnMousePressed(pc);
@@ -295,15 +329,20 @@ public class JeuFX {
         return lignes;
     }
 
+    /**
+     * Dévoile la case tout en gérant la victoire et la défaite
+     * @param c Case à dévoiler
+     */
     public void devoiler(Case c){
         Case matCase = jeu.getPartie().getCaseMatrice(c.getRow(), c.getColumn());
         if(matCase instanceof Mine m){
             // Si cliqué sur une mine
             m.touchee();
             try {
+                // Gestion de la défaite
                 jeu.setFin(true);
                 updateVisage(Visage.LOSE);
-                defaite(m);
+                defaite();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -314,9 +353,11 @@ public class JeuFX {
             
             if(jeu.getPartie().getCasesRestantes() == 0){
                 try {
+                    // Gestion de la victoire
                     jeu.setFin(true);
                     updateVisage(Visage.WIN);
                     victoire();
+                    // Pop-Up de victoire
                     Alert victoire = new Alert(AlertType.INFORMATION, 
                         "Vous avez gagné une partie "+jeu.getPartie().getDifficulte().getNom()+" en "+timerFX.getText()
                     );
@@ -329,25 +370,17 @@ public class JeuFX {
             }
             
             if(t.getBombesProches() == 0){
+                // Si la case n'a aucune bombe a proximité
                 decouvrirZoneSure(t);
             }
         }
     }
 
-    public Image getImage(Case c){
-        if(!c.getDecouvert()){
-            if(!c.getDrapeau()){
-                if(c instanceof Terrain){
-
-                }else if(c instanceof Mine){
-
-                }
-            }
-            return new Image("resources/flag/hidden_flag.png");
-        }
-        return new Image("resources/box/hidden.png");
-    }
-
+    /**
+     * Fonction qui révèlera toutes les cases aux alentours d'un terrain donné
+     * Appel récursif si un terrain voisin ne possède également pas de bombe a proximité
+     * @param t Terrain en question
+     */
     public void decouvrirZoneSure(Terrain t){
         Case[][] mat = jeu.getPartie().getMatricePlateau();
 
@@ -380,69 +413,58 @@ public class JeuFX {
         }
     }
 
-    public void defaite(Mine touchee) throws Exception{
+    /**
+     * Gestion de la défaite
+     * @throws Exception
+     */
+    public void defaite() throws Exception{
+        chrono.stop();
         jeu.getPartie().devoilerMines();
         jeu.getPartie().devoilerFauxDrapeaux();
-        VBox lignes = new VBox();
-
-        Case[][] mat = jeu.getPartie().getMatricePlateau();
-
-        for(int row = 0; row < mat.length; row++){
-            HBox col = new HBox();
-            for(int column = 0; column < mat[row].length; column++){
-                ImageView iv = new ImageView();
-                if(jeu.getPartie().getDifficulte().getId() == 3){
-                    iv.setFitWidth(20);
-                    iv.setFitHeight(20);
-                } else if(jeu.getPartie().getDifficulte().getId() >= 4){
-                    iv.setFitWidth(15);
-                    iv.setFitHeight(15);
-                }
-
-                Case c = jeu.getPartie().getCaseMatrice(row, column);
-                iv.setImage(c.getImage());
-                // Création d'une bordure gros pour bien distinguer les cases
-                BorderPane bp = new BorderPane(iv);
-                BorderStroke bs = new BorderStroke(
-                    Color.GREY, 
-                    BorderStrokeStyle.SOLID, 
-                    CornerRadii.EMPTY, 
-                    new BorderWidths(1, 1, 1, 1)
-                );
-    
-                bp.setBorder(new Border(bs));
-                col.getChildren().add(bp);
-            }
-            lignes.getChildren().add(col);
-        }
-        chrono.stop();
-        show(lignes);
+        show(AffichagePlateau());
     }
 
+    /**
+     * Gestion de la victoire
+     * @throws Exception
+     */
     public void victoire() throws Exception{
+        chrono.stop();
         if(jeu.getPartie().getNomSave() != null){
+            // Suppression de la sauvegarde si existante
             Sauvegarde.delete(jeu.getPartie().getNomSave());
         }
-        chrono.stop();
+        show(AffichagePlateau());
     }
 
+    /**
+     * Met à jour l'affichage du drapeau
+     */
     public void updateDrapeauxFX(){
         int nbr = jeu.getPartie().getNbrDrapeaux();
         nbrDrapeauFX.setText(" : "+String.valueOf(nbr));
         // Pour afficher le texte en rouge, il faut que le nombre de drapeaux
         // restant inférieur à 30% du nombre de drapeau (nombre de bombe) initiale
         if(nbr <= Math.round(jeu.getPartie().getDifficulte().getNbrBombe() * 30 / 100)){
-            
             nbrDrapeauFX.setTextFill(Color.rgb(180, 0, 0));
         }else{
             nbrDrapeauFX.setTextFill(Color.BLACK);
         }
     }
 
+    /**
+     * Met à jour le visage en le remplacant par un autre donné
+     * @param v Visage à placer
+     * @throws Exception
+     */
     public void updateVisage(Visage v) throws Exception{
         this.visage.setImage(v.getImage());
     }
 
+    /**
+     * Met à jour l'affichage du timer
+     * @throws Exception
+     */
     public void updateTimerFX() throws Exception{
         int m = 0, h = 0, s = 0;
         long ms = jeu.getPartie().getMillis();
@@ -465,6 +487,9 @@ public class JeuFX {
         timerFX.setText(text);
     }
 
+    /**
+     * Initialise le timer
+     */
     public void initTimer(){
         chrono = new Timeline();
         chrono.getKeyFrames().add(new KeyFrame(Duration.millis(1), event -> {
@@ -478,38 +503,74 @@ public class JeuFX {
         chrono.setCycleCount(Timeline.INDEFINITE);
     }
 
+    /**
+     * Renvoie le jeu (modèle)
+     * @return le jeu
+     */
     public Jeu getJeu() {
         return jeu;
     }
 
+    /**
+     * Renvoie le chrono
+     * @return le chrono
+     */
     public Timeline getChrono() {
         return chrono;
     }
 
+    /**
+     * Renvoie le label du compteur de drapeau
+     * @return le label
+     */
     public Label getNbrDrapeauFX() {
         return nbrDrapeauFX;
     }
 
+    /**
+     * Renvoie le plateau
+     * @return le plateau
+     */
     public VBox getPlateauFX() {
         return plateauFX;
     }
 
+    /**
+     * Renvoie la stage
+     * @return la stage
+     */
     public Stage getStage() {
         return stage;
     }
 
+    /**
+     * Renvoie le label du timer
+     * @return le label
+     */
     public Label getTimerFX() {
         return timerFX;
     }
 
+    /**
+     * Renvoie le visage actuelle
+     * @return l'imageView
+     */
     public ImageView getVisage() {
         return visage;
     }
 
+    /**
+     * Renvoie si le jeu est en pause ou non
+     * @return le booléen pause
+     */
     public boolean getPause(){
         return pause;
     }
 
+    /**
+     * Définit la pause par un autre booléen
+     * @param pause L'état de la pause
+     */
     public void setPause(boolean pause) {
         this.pause = pause;
     }
