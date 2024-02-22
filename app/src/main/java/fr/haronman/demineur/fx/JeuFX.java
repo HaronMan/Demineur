@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import fr.haronman.demineur.Sauvegarde;
 import fr.haronman.demineur.controller.jeu.MenuController;
+import fr.haronman.demineur.controller.jeu.PlateauController;
 import fr.haronman.demineur.model.Difficulte;
 import fr.haronman.demineur.model.Jeu;
 import fr.haronman.demineur.model.Plateau.Case.Case;
@@ -29,7 +30,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Border;
@@ -55,7 +55,6 @@ public class JeuFX {
     private ImageView visage;
     private Label timerFX;
     private Timeline chrono;
-    private boolean mouseInsideBP;
     private boolean pause;
 
     public JeuFX(Stage stage, Jeu jeu){
@@ -99,6 +98,11 @@ public class JeuFX {
         setPause.setId("pause");
         setPause.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN));
         setPause.setOnAction(new MenuController(this));
+
+        MenuItem recommencer = new MenuItem("Recommencer");
+        recommencer.setId("restart");
+        recommencer.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN));
+        recommencer.setOnAction(new MenuController(this));
 
         SeparatorMenuItem ligne = new SeparatorMenuItem();
 
@@ -156,7 +160,7 @@ public class JeuFX {
         Menu plus = new Menu("Plus");
         MenuItem regles = new MenuItem("Règles");
         
-        jeuBarre.getItems().addAll(sauvegarder, charger, setPause, ligne, tableauScore, quitter);
+        jeuBarre.getItems().addAll(sauvegarder, charger, setPause, recommencer, ligne, tableauScore, quitter);
         choix_difficulte.getItems().addAll(facile, intermediaire, difficile, expert, impossible, hardcore, diabolique);
         plus.getItems().addAll(regles);
 
@@ -252,7 +256,6 @@ public class JeuFX {
         for(int row = 0; row < mat.length; row++){
             HBox col = new HBox();
             for(int column = 0; column < mat[row].length; column++){
-                int x = row, y = column;
                 Case c = jeu.getPartie().getCaseMatrice(row, column);
 
                 ImageView iv = new ImageView(c.getImage());
@@ -273,82 +276,16 @@ public class JeuFX {
                     new BorderWidths(1)
                 );
 
-                // Permet de vérifier si la souris est toujours sur la case
-                // Un peu comme un droit a l'erreur
-                bp.setOnMouseEntered(event -> mouseInsideBP = true);
-                bp.setOnMouseExited(event -> mouseInsideBP = false);
+                PlateauController pc = new PlateauController(c, iv, this);
 
-                // Clic sur une case
-                bp.setOnMousePressed(event -> {
-                    if(event.getButton() == MouseButton.PRIMARY){
-                        if(!c.getDecouvert() && !c.getDrapeau() && !pause){
-                            try {
-                                updateVisage(Visage.ONCLICK);                                } catch (Exception e) {
-                                    e.printStackTrace();
-                            }
-                            iv.setImage(c.onClickImage());
-                        }
-                    }
-                });
-                bp.setOnMouseReleased(event -> {
-                    if(event.getButton() == MouseButton.PRIMARY){
-                        try {
-                            updateVisage(Visage.IDLE);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        if(mouseInsideBP){
-                            //Lancement du minuteur
-                            if(jeu.getPartie().getPremierClic() && !pause){
-                                jeu.getPartie().premierClicEffectue();
-                                chrono.play();
-                                if(c instanceof Mine){
-                                    c.decouvrir();
-                                    Terrain t = jeu.getPartie().replacerMine(c);
-                                    jeu.getPartie().getMatricePlateau()[x][y] = t;
-                                    if(!t.getDecouvert() && !t.getDrapeau()){ // Si on souhaite la découvrir
-                                        // Condtions : caché et pas de drapeau
-                                    devoiler(t);
-                                    iv.setImage(t.getImage());
-                                    }
-                                }
-                            }if(!c.getDecouvert() && !c.getDrapeau() && !pause){ // Si on souhaite la découvrir
-                                // Condtions : caché et pas de drapeau
-                                devoiler(c);
-                                iv.setImage(c.getImage());
-                            }
-                        }else{
-                            iv.setImage(c.getImage());
-                        }
-                    }
-                });
-                bp.setOnMouseClicked(event -> {
-                    if(jeu.getPartie().getPremierClic() && !pause){
-                        jeu.getPartie().premierClicEffectue();
-                        chrono.play();
-                    }
-                    if(event.getButton() == MouseButton.SECONDARY) {
-                        // Si on souhaite manipuler les drapeaux
-                        if(!c.getDecouvert() && !pause){
-                            if(!c.getDrapeau()){
-                                // Placer un drapeau
-                                if(jeu.getPartie().getNbrDrapeaux() > 0){                                        
-                                    // Si il reste au moins un drapeau en stock
-                                    c.insererDrapeau();
-                                    jeu.getPartie().retirerDrapeaux();
-                                    jeu.getPartie().addEmplacementsDrapeaux(new Integer[]{c.getRow(), c.getColumn()});
-                                }
-                            }else{
-                                // Retirer un drapeau
-                                c.retirerDrapeau();
-                                jeu.getPartie().removeEmplacementsDrapeaux(new Integer[]{c.getRow(), c.getColumn()});
-                                jeu.getPartie().ajouterDrapeaux();
-                            }
-                            updateDrapeauxFX();
-                            iv.setImage(c.getImage());
-                        }
-                    }
-                });
+                if(!jeu.getFin()){
+                    bp.setOnMouseEntered(pc);
+                    bp.setOnMouseExited(pc);
+                    bp.setOnMousePressed(pc);
+                    bp.setOnMouseReleased(pc);
+                    bp.setOnMouseClicked(pc);
+                }
+
                 bp.setBorder(new Border(bs));
                 col.getChildren().add(bp);
             }
@@ -483,44 +420,10 @@ public class JeuFX {
     }
 
     public void victoire() throws Exception{
-        VBox lignes = new VBox();
-
-        Case[][] mat = jeu.getPartie().getMatricePlateau();
-
-        for(int row = 0; row < mat.length; row++){
-            HBox col = new HBox();
-            for(int column = 0; column < mat[row].length; column++){
-                ImageView iv = new ImageView();
-
-                Case c = jeu.getPartie().getCaseMatrice(row, column);
-                iv.setImage(c.getImage());
-                if(jeu.getPartie().getDifficulte().getId() == 3){
-                    iv.setFitWidth(20);
-                    iv.setFitHeight(20);
-                } else if(jeu.getPartie().getDifficulte().getId() >= 4){
-                    iv.setFitWidth(15);
-                    iv.setFitHeight(15);
-                }
-
-                // Création d'une bordure gros pour bien distunguer les cases
-                BorderPane bp = new BorderPane(iv);
-                BorderStroke bs = new BorderStroke(
-                    Color.GREY, 
-                    BorderStrokeStyle.SOLID, 
-                    CornerRadii.EMPTY, 
-                    new BorderWidths(1, 1, 1, 1)
-                );
-    
-                bp.setBorder(new Border(bs));
-                col.getChildren().add(bp);
-            }
-            lignes.getChildren().add(col);
-        }
         if(jeu.getPartie().getNomSave() != null){
             Sauvegarde.delete(jeu.getPartie().getNomSave());
         }
         chrono.stop();
-        show(lignes);
     }
 
     public void updateDrapeauxFX(){

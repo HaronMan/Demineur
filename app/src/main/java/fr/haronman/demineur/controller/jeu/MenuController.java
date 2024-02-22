@@ -7,7 +7,8 @@ import java.util.Optional;
 import fr.haronman.demineur.Sauvegarde;
 import fr.haronman.demineur.fx.JeuFX;
 import fr.haronman.demineur.fx.NomSauvegardeFX;
-import fr.haronman.demineur.model.Jeu;
+import fr.haronman.demineur.fx.Visage;
+import fr.haronman.demineur.model.Difficulte;
 import fr.haronman.demineur.model.Partie;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -51,6 +52,9 @@ public class MenuController implements EventHandler<ActionEvent>{
                             reprendre();
                         }
                     }
+                    break;
+                case "restart":
+                    recommencer();
                     break;
                 default:
                     break;
@@ -124,5 +128,19 @@ public class MenuController implements EventHandler<ActionEvent>{
         jeuFX.setPause(false);
         jeuFX.getChrono().play();
         jeuFX.getPlateauFX().setOpacity(1);
+    }
+
+    private void recommencer(){
+        if(!jeuFX.getJeu().getPartie().getPremierClic()){
+            Difficulte courant = jeuFX.getJeu().getPartie().getDifficulte();
+            try {
+                jeuFX.updateVisage(Visage.IDLE);
+                jeuFX.getChrono().stop();
+                jeuFX.getJeu().getPartie().setMillis(0);
+                jeuFX.getJeu().start(courant);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
