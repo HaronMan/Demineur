@@ -17,19 +17,31 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.MenuItem;
 import javafx.stage.FileChooser;
 
+/**
+ * Classe gérant les évenements de la barre de menu dans "JeuFX"
+ * @author HaronMan
+ */
 public class MenuController implements EventHandler<ActionEvent>{
+    // Vue
     private JeuFX jeuFX;
 
+    /**
+     * Constructeur
+     * @param jeuFX Vue du jeu
+     */
     public MenuController(JeuFX jeuFX){
         this.jeuFX = jeuFX;
     }
 
+    
     @Override
     public void handle(ActionEvent event){
         if(event.getSource() instanceof MenuItem){
+            // Récupération du MenuItem selectionné
             MenuItem choix = (MenuItem) event.getSource();
             String id = choix.getId();
             switch (id) {
+                // Si le menu sélectionné est "Sauvegarde"
                 case "save":
                     try {
                         sauvegarder();
@@ -37,6 +49,7 @@ public class MenuController implements EventHandler<ActionEvent>{
                         e.printStackTrace();
                     }
                     break;
+                // Si le menu sélectionné est "Charger"
                 case "load":
                     try {
                         charger();
@@ -44,6 +57,7 @@ public class MenuController implements EventHandler<ActionEvent>{
                         e.printStackTrace();
                     }
                     break;
+                // Si le menu sélectionné est "Pause"
                 case "pause":
                     if(!jeuFX.getJeu().getFin()){
                         if(!jeuFX.getPause()) {
@@ -53,6 +67,7 @@ public class MenuController implements EventHandler<ActionEvent>{
                         }
                     }
                     break;
+                // Si le menu sélectionné est "Recommencé"
                 case "restart":
                     recommencer();
                     break;
@@ -61,7 +76,12 @@ public class MenuController implements EventHandler<ActionEvent>{
             }
         }
     }
-    
+
+    /**
+     * Gestion de la sauvegarde d'une partie
+     * @throws ClassNotFoundException
+     * @throws IOException
+     */
     private void sauvegarder() throws ClassNotFoundException, IOException{
         if(!jeuFX.getJeu().getPartie().getPremierClic()){
             jeuFX.getChrono().stop();
@@ -91,13 +111,20 @@ public class MenuController implements EventHandler<ActionEvent>{
             jeuFX.getChrono().play();
         }
     }
-
+    
+    /**
+     * Gestion du chargement d'une partie
+     * @throws ClassNotFoundException
+     * @throws IOException
+     */
     private void charger() throws ClassNotFoundException, IOException{
         jeuFX.getChrono().stop();
         FileChooser fc = new FileChooser();
         fc.setTitle("Choississez une sauvegarde");
-        //Voir uniquement les fichiers .save
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Sauvegardes", "*.save");
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+            "Sauvegardes",
+            "*.save" //Voir uniquement les fichiers .save
+            );
         fc.getExtensionFilters().add(extFilter);
         fc.setInitialDirectory(new File(Sauvegarde.CHEMIN_SAUVEGARDE));
 
@@ -116,6 +143,9 @@ public class MenuController implements EventHandler<ActionEvent>{
         }
     }
 
+    /**
+     * Met le jeu en pause
+     */
     private void pause(){
         if(!jeuFX.getJeu().getPartie().getPremierClic()){
             jeuFX.setPause(true);
@@ -124,12 +154,18 @@ public class MenuController implements EventHandler<ActionEvent>{
         }
     }
 
+    /**
+     * Reprend le jeu
+     */
     private void reprendre(){
         jeuFX.setPause(false);
         jeuFX.getChrono().play();
         jeuFX.getPlateauFX().setOpacity(1);
     }
 
+    /**
+     * Recrée une partie et réinitialise le timer
+     */
     private void recommencer(){
         if(!jeuFX.getJeu().getPartie().getPremierClic()){
             Difficulte courant = jeuFX.getJeu().getPartie().getDifficulte();

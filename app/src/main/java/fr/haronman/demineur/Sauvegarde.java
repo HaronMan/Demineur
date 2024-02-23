@@ -11,15 +11,27 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Optional;
 
+/**
+ * Classe contenant les méthodes statiques qui gèrent tout le système de sauvegarde du jeu
+ *? Lire le Readme pour plus d'informations sur le système de sauvegarde
+ * @author HaronMan
+ */
 public class Sauvegarde implements Serializable{
+    // Chemin du dossier de sauvegardes 
     public static final String CHEMIN_SAUVEGARDE = "C:\\Users\\hkoch\\Documents\\demineur\\saves";
 
-    public Sauvegarde(){}
-
-    public void save(Partie partie) throws IOException, ClassNotFoundException{
+    /**
+     * Effectue une sauvegarde de la partie donnée
+     * @param partie partie donnée
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    public static void save(Partie partie) throws IOException, ClassNotFoundException{
         // Sauvegarde dans un fichier (resources/save)
         File dossier = new File(CHEMIN_SAUVEGARDE);
+
         if(!dossier.exists()){dossier.mkdirs();}
+        // Si le dossier de sauvegarde n'existe pas
 
         String nomFichier = partie.getNomSave()+".save";
         File fichier = new File(Sauvegarde.CHEMIN_SAUVEGARDE+"\\"+nomFichier);
@@ -32,10 +44,18 @@ public class Sauvegarde implements Serializable{
         oos.close();
     }
 
-    public Optional<Partie> load(File fichier) throws IOException, ClassNotFoundException{
+    /**
+     * Effectue un chargement d'une sauvegarde à partir d'un fichier
+     * @param fichier fichier à récupérer
+     * @return Partie contenu dans la sauvegarde
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    public static Optional<Partie> load(File fichier) throws IOException, ClassNotFoundException{
         // Chargement d'une partie dans un fichier
         File dossier = new File(CHEMIN_SAUVEGARDE);
         if(!dossier.exists()){
+            // Si le dossier de sauvegarde n'existe pas
             dossier.mkdirs();
             return Optional.empty();
         }else{
@@ -46,6 +66,11 @@ public class Sauvegarde implements Serializable{
         }
     }
 
+    /**
+     * Supprime un fichier de sauvegarde
+     * @param nom nom du fichier
+     * @throws IOException
+     */
     public static void delete(String nom) throws IOException{
         //Supression d'un fichier à partir de son nom
         File dossier = new File(CHEMIN_SAUVEGARDE);
@@ -53,9 +78,11 @@ public class Sauvegarde implements Serializable{
             dossier.mkdirs();
         }else{
             File[] fichiers = new File(CHEMIN_SAUVEGARDE).listFiles();
+            // Récupère tous les fichiers de sauvegarde et les stocke dans un tableau
             if(fichiers != null && fichiers.length > 0){
                 for(File f : fichiers){
                     if(f.isFile() && f.getName().endsWith(".save")){
+                        // Si le fichier possède l'extension .save
                         String nomFichier = f.getName();
                         nomFichier = nomFichier.substring(0, nomFichier.lastIndexOf("."));
                         if(nomFichier.equals(nom)){
@@ -68,17 +95,26 @@ public class Sauvegarde implements Serializable{
         }
     }
 
+    /**
+     * Vérifie si un nom de sauvegarde existe déjà,
+     * respecte la contrainte unique de la sauvegarde
+     * @param nom
+     * @return
+     * @throws IOException
+     */
     public static boolean nomDejaExistant(String nom) throws IOException{
-        //Vérificationd e l'existence d'un fichier à partir d'un nom
+        //Vérification de l'existence d'un fichier à partir d'un nom
         File dossier = new File(CHEMIN_SAUVEGARDE);
         if(!dossier.exists()){
             dossier.mkdirs();
             return false;
         }else{
             File[] fichiers = new File(CHEMIN_SAUVEGARDE).listFiles();
+            // Récupère tous les fichiers de sauvegarde et les stocke dans un tableau
             if(fichiers != null && fichiers.length > 0){
                 for(File f : fichiers){
                     if(f.isFile() && f.getName().endsWith(".save")){
+                        // Si le fichier possède l'extension .save
                         String nomFichier = f.getName();
                         nomFichier = nomFichier.substring(0, nomFichier.lastIndexOf("."));
                         if(nomFichier.equals(nom)){

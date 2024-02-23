@@ -3,24 +3,37 @@ package fr.haronman.demineur.model.Plateau.Case;
 import fr.haronman.demineur.fx.CaseImageBuilder;
 import javafx.scene.image.Image;
 
+/**
+ * Classe héritant de Case qui agit comme une mine
+ * @author HaronMan
+ */
 public class Mine extends Case{
+    // Si il a été cliqué
     private boolean touche;
-    private boolean drapeau_pose;
 
+    /**
+     * Constructeur
+     * @param row Ligne de la matrice
+     * @param column Colonne de la matrice
+     */
     public Mine(int row, int column){
         super(row, column);
         touche = false;
-        drapeau_pose = false;
     }
 
+    /**
+     * Si cliqué
+     */
     public void touchee(){
         decouvrir();
         touche = true;
     }
 
+    /**
+     * Si un drapeau est placé dessus (drapeau correct)
+     */
     public void bonne_mine(){
         decouvrir();
-        drapeau_pose = true;
     }
 
     @Override
@@ -34,7 +47,7 @@ public class Mine extends Case{
         if(touche){
             return CaseImageBuilder.MINE_CLICKED.image;
         }
-        if(drapeau_pose){
+        if(getDrapeau()){
             return CaseImageBuilder.FLAG_CORRECT.image;
         }
         return CaseImageBuilder.MINE.image;

@@ -6,6 +6,10 @@ import fr.haronman.demineur.model.Jeu;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+/**
+ * Classe principale de l'application, lance le main
+ * @author HaronMan
+ */
 public class Main extends Application{
 
     public static void main(String[] args) {

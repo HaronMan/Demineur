@@ -10,12 +10,26 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
+/**
+ * Classe qui gère les actions sur le plateau du jeu
+ * @author HaronMan
+ */
 public class PlateauController implements EventHandler<MouseEvent>{
+    // Vue du jeu
     private JeuFX jeuFX;
+    // Case cliquée
     private Case c;
+    // Image de la case cliquée
     private ImageView iv;
+    // Définit si la souris est toujours dans la case au maintient de souris
     private boolean mouseInsideBP;
 
+    /**
+     * Constructeur
+     * @param c Case cliquée
+     * @param iv Image de la case cliquée
+     * @param jeuFX Vue du jeu
+     */
     public PlateauController(Case c, ImageView iv, JeuFX jeuFX){
         this.c = c;
         this.jeuFX = jeuFX;
@@ -32,6 +46,7 @@ public class PlateauController implements EventHandler<MouseEvent>{
             mouseInsideBP = false;
         }
 
+        // Clic souris maintenu (clic gauche)
         if(event.getEventType() == MouseEvent.MOUSE_PRESSED){
             if(event.getButton() == MouseButton.PRIMARY){
                 if(!c.getDecouvert() && !c.getDrapeau() && !jeuFX.getPause()){
@@ -44,6 +59,7 @@ public class PlateauController implements EventHandler<MouseEvent>{
                 }
             }
         }
+        // Clic souris relaché (clic gauche)
         if(event.getEventType() == MouseEvent.MOUSE_RELEASED){
             int x = c.getRow(), y = c.getColumn();
             if(event.getButton() == MouseButton.PRIMARY){
@@ -77,7 +93,7 @@ public class PlateauController implements EventHandler<MouseEvent>{
                 }
             }
         }
-
+        // Si clic souris (clic droit)
         if(event.getEventType() == MouseEvent.MOUSE_CLICKED){
             if(event.getButton() == MouseButton.SECONDARY) {
                 if(jeuFX.getJeu().getPartie().getPremierClic()){
@@ -107,6 +123,10 @@ public class PlateauController implements EventHandler<MouseEvent>{
         }
     }
 
+    /**
+     * Renvoie l'image de la case
+     * @return l'image de la case
+     */
     public ImageView getImageView() {
         return iv;
     }

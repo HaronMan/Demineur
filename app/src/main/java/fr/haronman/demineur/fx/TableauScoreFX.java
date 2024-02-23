@@ -2,6 +2,11 @@ package fr.haronman.demineur.fx;
 
 import javafx.stage.Stage;
 
+/**
+ * Classe gérant le tableau des scores
+ * TODO
+ * @author HaronMan
+ */
 public class TableauScoreFX {
     
     public static void show(){

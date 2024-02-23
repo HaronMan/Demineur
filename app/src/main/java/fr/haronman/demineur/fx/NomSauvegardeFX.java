@@ -17,12 +17,22 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+/**
+ * Affichage du formulaire permettant de rensigner le nom de la sauvegarde
+ * @author HaronMan
+ */
 public class NomSauvegardeFX {
     private String nom;
 
+    /**
+     * Constructeur
+     */
     public NomSauvegardeFX(){
     }
 
+    /**
+     * Affichage de la fenêtre
+     */
     public void show(){
         Stage stage = new Stage();
         stage.setTitle("Nom sauvegarde");
@@ -87,6 +97,10 @@ public class NomSauvegardeFX {
         stage.showAndWait();
     }
 
+    /**
+     * Renvoie le nom inséré
+     * @return le nom
+     */
     public String getNom() {
         return nom;
     }
