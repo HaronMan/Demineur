@@ -83,7 +83,7 @@ public class PlateauController implements EventHandler<MouseEvent>{
                                 iv.setImage(t.getImage());
                             }
                         }
-                    }if(!c.getDecouvert() && !c.getDrapeau() && !jeuFX.getPause()){ // Si on souhaite la découvrir
+                    }if(!c.getDecouvert() && !c.getDrapeau()){ // Si on souhaite la découvrir
                         // Condtions : caché et pas de drapeau
                         jeuFX.devoiler(c);
                         iv.setImage(c.getImage());
@@ -96,7 +96,7 @@ public class PlateauController implements EventHandler<MouseEvent>{
         // Si clic souris (clic droit)
         if(event.getEventType() == MouseEvent.MOUSE_CLICKED){
             if(event.getButton() == MouseButton.SECONDARY) {
-                if(jeuFX.getJeu().getPartie().getPremierClic() && !jeuFX.getPause()){
+                if(jeuFX.getJeu().getPartie().getPremierClic()){
                     jeuFX.getJeu().getPartie().premierClicEffectue();
                     jeuFX.getChrono().play();
                 }
