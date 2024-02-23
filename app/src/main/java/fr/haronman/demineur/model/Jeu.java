@@ -104,7 +104,7 @@ public class Jeu {
      * @throws ClassNotFoundException
      */
     public void save(Partie partie) throws IOException, ClassNotFoundException{
-        new Sauvegarde().save(partie);
+        Sauvegarde.save(partie);
     }
 
     /**
@@ -116,8 +116,7 @@ public class Jeu {
      * @throws ClassNotFoundException
      */
     public Optional<Partie> load(File file) throws IOException, ClassNotFoundException{
-        return new Sauvegarde().load(file);
-
+        return Sauvegarde.load(file);
     }
 
 
