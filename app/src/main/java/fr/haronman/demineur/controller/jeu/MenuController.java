@@ -93,7 +93,7 @@ public class MenuController implements EventHandler<ActionEvent>{
                     jeuFX.getJeu().save(jeuFX.getJeu().getPartie());
 
                     Alert confirmation = new Alert(AlertType.INFORMATION, 
-                "La partie a bien été sauvegardée"
+                    "La partie a bien été sauvegardée"
                     );
                     confirmation.setTitle("Sauvegarde");
                     confirmation.setHeaderText("Sauvegarde effectué");
@@ -103,12 +103,14 @@ public class MenuController implements EventHandler<ActionEvent>{
                 jeuFX.getJeu().save(jeuFX.getJeu().getPartie());
                 Alert confirmation = new Alert(AlertType.INFORMATION, 
                 "La partie a bien été sauvegardée"
-                    );
+                );
                 confirmation.setTitle("Sauvegarde");
                 confirmation.setHeaderText("Sauvegarde effectué");
                 confirmation.showAndWait();
             }
-            jeuFX.getChrono().play();
+            if(!jeuFX.getPause()){
+                jeuFX.getChrono().play();
+            }
         }
     }
     
@@ -148,9 +150,14 @@ public class MenuController implements EventHandler<ActionEvent>{
                     + "veuillez en sélectionner une autre"
                 );
                 erreur.showAndWait();
+                if(!jeuFX.getPause()){
+                    jeuFX.getChrono().play();
+                }
             }
         }else{
-            jeuFX.getChrono().play();
+            if(!jeuFX.getPause()){
+                jeuFX.getChrono().play();
+            }
         }
     }
 

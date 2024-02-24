@@ -110,6 +110,18 @@ public class JeuFX {
         // Première colonne (Jeu)
         Menu jeuBarre = new Menu("Jeu");
 
+        MenuItem setPause = new MenuItem("Pause / Reprendre");
+        setPause.setId("pause");
+        setPause.setAccelerator(new KeyCodeCombination(KeyCode.P));
+        setPause.setOnAction(new MenuController(this));
+
+        MenuItem recommencer = new MenuItem("Recommencer");
+        recommencer.setId("restart");
+        recommencer.setAccelerator(new KeyCodeCombination(KeyCode.R));
+        recommencer.setOnAction(new MenuController(this));
+
+        SeparatorMenuItem ligne = new SeparatorMenuItem();
+
         MenuItem sauvegarder = new MenuItem("Sauvegarder");
         sauvegarder.setId("save");
         sauvegarder.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
@@ -122,27 +134,6 @@ public class JeuFX {
         charger.setId("load");
         charger.setAccelerator(new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN));
         charger.setOnAction(new MenuController(this));
-
-        MenuItem setPause = new MenuItem("Pause / Reprendre");
-        setPause.setId("pause");
-        setPause.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN));
-        setPause.setOnAction(new MenuController(this));
-
-        MenuItem recommencer = new MenuItem("Recommencer");
-        recommencer.setId("restart");
-        recommencer.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN));
-        recommencer.setOnAction(new MenuController(this));
-
-        SeparatorMenuItem ligne = new SeparatorMenuItem();
-
-        MenuItem tableauScore = new MenuItem("Tableau des scores");
-        tableauScore.setId("tabScore");
-        tableauScore.setAccelerator(new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
-        tableauScore.setOnAction(action -> {
-            // TODO
-            TableauScoreFX.show();
-            System.err.println("Tableau des scores non implémenté");
-        });
 
         MenuItem quitter = new MenuItem("Quitter");
         quitter.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
@@ -189,11 +180,23 @@ public class JeuFX {
 
         // TODO Troisième colonne
         Menu plus = new Menu("Plus");
-        MenuItem regles = new MenuItem("Règles");
+
+        MenuItem tableauScore = new MenuItem("Tableau des scores");
+        tableauScore.setId("tabScore");
+        tableauScore.setAccelerator(new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
+        tableauScore.setOnAction(action -> {
+            // TODO
+            TableauScoreFX.show();
+            System.err.println("Tableau des scores non implémenté");
+        });
+
+        MenuItem cmds = new MenuItem("Commandes");
+        cmds.setId("cmds");
+        cmds.setAccelerator(new KeyCodeCombination(KeyCode.H, KeyCodeCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
         
-        jeuBarre.getItems().addAll(sauvegarder, charger, setPause, recommencer, ligne, tableauScore, quitter);
+        jeuBarre.getItems().addAll(setPause, recommencer, ligne, sauvegarder, charger, quitter);
         choix_difficulte.getItems().addAll(facile, intermediaire, difficile, expert, impossible, hardcore, diabolique);
-        plus.getItems().addAll(regles);
+        plus.getItems().addAll(cmds, tableauScore);
 
         menuBarre.getMenus().addAll(jeuBarre, choix_difficulte, plus);
 
