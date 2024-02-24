@@ -139,6 +139,7 @@ public class JeuFX {
         tableauScore.setId("tabScore");
         tableauScore.setAccelerator(new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
         tableauScore.setOnAction(action -> {
+            // TODO
             TableauScoreFX.show();
             System.err.println("Tableau des scores non implémenté");
         });

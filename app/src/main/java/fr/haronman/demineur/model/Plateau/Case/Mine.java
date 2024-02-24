@@ -1,5 +1,7 @@
 package fr.haronman.demineur.model.Plateau.Case;
 
+import java.io.Serial;
+
 import fr.haronman.demineur.fx.CaseImageBuilder;
 import javafx.scene.image.Image;
 
@@ -8,6 +10,9 @@ import javafx.scene.image.Image;
  * @author HaronMan
  */
 public class Mine extends Case{
+    // Id pour sauvegarde (Serializable)
+    @Serial
+    private static final long serialVersionUID = -8558941516743330845L;
     // Si il a été cliqué
     private boolean touche;
 
