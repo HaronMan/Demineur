@@ -118,6 +118,4 @@ public class Jeu {
     public Optional<Partie> load(File file) throws IOException, ClassNotFoundException{
         return Sauvegarde.load(file);
     }
-
-
 }

@@ -122,7 +122,7 @@ public class MenuController implements EventHandler<ActionEvent>{
         FileChooser fc = new FileChooser();
         fc.setTitle("Choississez une sauvegarde");
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-            "Sauvegardes",
+            "Sauvegarde",
             "*.save" //Voir uniquement les fichiers .save
             );
         fc.getExtensionFilters().add(extFilter);
@@ -130,14 +130,25 @@ public class MenuController implements EventHandler<ActionEvent>{
 
         File sauvegarde = fc.showOpenDialog(jeuFX.getStage());
         if(sauvegarde != null){
-            Optional<Partie> loadPartie = jeuFX.getJeu().load(sauvegarde);
-            loadPartie.ifPresent(p -> {
-                try {
-                    jeuFX.getJeu().start(p);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
+            try{
+                Optional<Partie> loadPartie = jeuFX.getJeu().load(sauvegarde);
+                loadPartie.ifPresent(p -> {
+                    try {
+                        jeuFX.getJeu().start(p);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+            }catch(Exception e){
+                Alert erreur = new Alert(AlertType.ERROR);
+                erreur.setTitle("Chargement impossible");
+                erreur.setHeaderText("Erreur : Chargement echoué");
+                erreur.setContentText(
+                    "Une erreur est survenue lors du chargement de la partie, " 
+                    + "veuillez en sélectionner une autre"
+                );
+                erreur.showAndWait();
+            }
         }else{
             jeuFX.getChrono().play();
         }
