@@ -3,6 +3,7 @@ package fr.haronman.demineur;
 import fr.haronman.demineur.fx.JeuFX;
 import fr.haronman.demineur.model.Difficulte;
 import fr.haronman.demineur.model.Jeu;
+import fr.haronman.demineur.model.TableauScore;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -18,6 +19,7 @@ public class Main extends Application{
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        TableauScore.creerDossier();
         Jeu jeu = Jeu.getInstance();
         jeu.setJeuFX(new JeuFX(primaryStage, jeu));
         jeu.start(Difficulte.INTERMEDIAIRE);
