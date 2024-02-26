@@ -8,6 +8,7 @@ import fr.haronman.demineur.controller.jeu.PlateauController;
 import fr.haronman.demineur.model.Difficulte;
 import fr.haronman.demineur.model.Jeu;
 import fr.haronman.demineur.model.Partie;
+import fr.haronman.demineur.model.TableauxScores;
 import fr.haronman.demineur.model.Plateau.Case.Case;
 import fr.haronman.demineur.model.Plateau.Case.Mine;
 import fr.haronman.demineur.model.Plateau.Case.Terrain;
@@ -369,6 +370,11 @@ public class JeuFX {
                     victoire.setTitle("Victoire");
                     victoire.setHeaderText("Vous avez gagné !!!");
                     victoire.showAndWait();
+
+                    if(jeu.getPartie().getNomSave() == null){
+                        // TODO
+                    }
+                    TableauxScores.addToTableau(jeu.getPartie());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

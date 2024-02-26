@@ -40,7 +40,27 @@ public class TableauxScores {
         return tab;
     }
 
-    
+    /**
+     * Ajoute le nouveau score au tableau si dans les 10 premiers
+     * Si pas encore de score sur ce tableau, ajoute automatiquement
+     * à la première place
+     * @param p
+     * @throws IOException 
+     */
+    public static void addToTableau(Partie p) throws IOException{
+        HashMap<Integer, Partie> tab = getTableau(p.getDifficulte());
+        boolean placee = false;
+        for(Partie val : tab.values()){
+            if(val == null){
+                val = p;
+                placee = true;
+            }
+        }
+
+        if(!placee){
+            // TODO
+        }
+    }
 
     /**
      * Crée le fichier du tableau des scores à la 
