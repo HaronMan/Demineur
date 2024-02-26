@@ -7,6 +7,7 @@ import fr.haronman.demineur.controller.jeu.MenuController;
 import fr.haronman.demineur.controller.jeu.PlateauController;
 import fr.haronman.demineur.model.Difficulte;
 import fr.haronman.demineur.model.Jeu;
+import fr.haronman.demineur.model.Partie;
 import fr.haronman.demineur.model.Plateau.Case.Case;
 import fr.haronman.demineur.model.Plateau.Case.Mine;
 import fr.haronman.demineur.model.Plateau.Case.Terrain;
@@ -470,24 +471,7 @@ public class JeuFX {
      * @throws Exception
      */
     public void updateTimerFX() throws Exception{
-        int m = 0, h = 0, s = 0;
-        long ms = jeu.getPartie().getMillis();
-        String text = "";
-        while(ms >= 1000){
-            s++;
-            ms -= 1000;
-        }
-        while(s >= 60){
-            m++;
-            s -= 60;
-        }
-        while(m >= 60){
-            h++;
-            m -= 60;
-        }
-        text += (h > 0) ? h+"h" : "";
-        text += (m > 0) ? m+"m" : "";
-        text += s+"s";
+        String text = Partie.convertTime(jeu.getPartie());
         timerFX.setText(text);
     }
 

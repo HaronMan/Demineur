@@ -26,7 +26,7 @@ public class TableauxScores {
     public static HashMap<Integer, Partie> getTableau(Difficulte difficulte) throws IOException{
         HashMap<Integer, Partie> tab = new HashMap<Integer, Partie>();
         if(!creerFichierTableau(difficulte)){
-            File tabFile = new File(CHEMIN_TABLEAU+difficulte.getNom().toLowerCase()+".sb");
+            File tabFile = new File(CHEMIN_TABLEAU+"\\"+difficulte.getNom().toLowerCase()+".sb");
             FileInputStream fis = new FileInputStream(tabFile);
             ObjectInputStream ois = new ObjectInputStream(fis);
             try {
@@ -40,6 +40,8 @@ public class TableauxScores {
         return tab;
     }
 
+    
+
     /**
      * Crée le fichier du tableau des scores à la 
      * difficulté souhaité si non existant.
@@ -49,13 +51,17 @@ public class TableauxScores {
      * @throws IOException 
      */
     private static boolean creerFichierTableau(Difficulte difficulte) throws IOException{
-        File tableau = new File(CHEMIN_TABLEAU+difficulte.getNom().toLowerCase()+".sb");
+        File tableau = new File(CHEMIN_TABLEAU+"\\"+difficulte.getNom().toLowerCase()+".sb");
         if(!tableau.exists()){
+            HashMap<Integer, Partie> tab = new HashMap<Integer, Partie>();
+            for(int i = 1; i <= 10; i++){
+                tab.put(i, null);
+            }
             // Si le fichier de sauvegarde n'existe pas
             // Creation du fichier
             FileOutputStream fos = new FileOutputStream(tableau);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(new HashMap<Integer, Partie>());
+            oos.writeObject(tab);
             oos.close();
             return true;
         }
@@ -82,8 +88,10 @@ public class TableauxScores {
      */
     private static void recreerFichierTableau(Difficulte difficulte) throws IOException{
         //Supression d'un fichier à partir de son nom
-        File fichier = new File(CHEMIN_TABLEAU+difficulte.getNom().toLowerCase()+".sb");
+        File fichier = new File(CHEMIN_TABLEAU+"\\"+difficulte.getNom().toLowerCase()+".sb");
         fichier.delete();
         creerFichierTableau(difficulte);
     }
+
+
 }

@@ -30,7 +30,7 @@ public class Partie implements Serializable{
     // Difficulté de la partie
     private final Difficulte difficulte;
     // Temps écoulé depuis le début de la partie (en ms)
-    private long millis;
+    private static long millis;
     
     /**
      * Constructeur
@@ -252,5 +252,27 @@ public class Partie implements Serializable{
      */
     public void incrementMillis(){
         millis++;
+    }
+
+    public static String convertTime(Partie p){
+        int m = 0, h = 0, s = 0;
+        long ms = p.getMillis();
+        String text = "";
+        while(ms >= 1000){
+            s++;
+            ms -= 1000;
+        }
+        while(s >= 60){
+            m++;
+            s -= 60;
+        }
+        while(m >= 60){
+            h++;
+            m -= 60;
+        }
+        text += (h > 0) ? h+"h" : "";
+        text += (m > 0) ? m+"m" : "";
+        text += s+"s";
+        return text;
     }
 }
