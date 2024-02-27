@@ -3,12 +3,12 @@ package fr.haronman.demineur.fx;
 import java.util.Optional;
 
 import fr.haronman.demineur.Sauvegarde;
+import fr.haronman.demineur.TableauxScores;
 import fr.haronman.demineur.controller.jeu.MenuController;
 import fr.haronman.demineur.controller.jeu.PlateauController;
 import fr.haronman.demineur.model.Difficulte;
 import fr.haronman.demineur.model.Jeu;
 import fr.haronman.demineur.model.Partie;
-import fr.haronman.demineur.model.TableauxScores;
 import fr.haronman.demineur.model.Plateau.Case.Case;
 import fr.haronman.demineur.model.Plateau.Case.Mine;
 import fr.haronman.demineur.model.Plateau.Case.Terrain;
@@ -187,9 +187,7 @@ public class JeuFX {
         tableauScore.setId("tabScore");
         tableauScore.setAccelerator(new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
         tableauScore.setOnAction(action -> {
-            // TODO
             TableauScoreFX.show();
-            System.err.println("Tableau des scores non implémenté");
         });
 
         MenuItem cmds = new MenuItem("Commandes");
@@ -372,7 +370,11 @@ public class JeuFX {
                     victoire.showAndWait();
 
                     if(jeu.getPartie().getNomSave() == null){
-                        // TODO
+                        NomSauvegardeFX sauvegardeFX = new NomSauvegardeFX();
+                        sauvegardeFX.show();
+                        if(sauvegardeFX.getNom() != null){
+                            jeu.getPartie().setNomSave(sauvegardeFX.getNom());
+                        }
                     }
                     TableauxScores.addToTableau(jeu.getPartie());
                 } catch (Exception e) {

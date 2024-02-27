@@ -1,8 +1,8 @@
 package fr.haronman.demineur.fx;
 
+import fr.haronman.demineur.TableauxScores;
 import fr.haronman.demineur.model.Difficulte;
 import fr.haronman.demineur.model.Partie;
-import fr.haronman.demineur.model.TableauxScores;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;

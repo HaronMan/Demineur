@@ -1,4 +1,4 @@
-package fr.haronman.demineur.model;
+package fr.haronman.demineur;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,13 +8,18 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
 
+import fr.haronman.demineur.model.Difficulte;
+import fr.haronman.demineur.model.Partie;
+
 /**
  * Classe permettant de manipuler le fichier de tableau des scores
  * Si non existant, il sera automatiquement créé au lancement du jeu
  * @author HaronMan
  */
 public class TableauxScores {
-    private static final String CHEMIN_TABLEAU = "C:\\Users\\hkoch\\Documents\\demineur\\scoreboard";
+    private static final String CHEMIN_TABLEAU = 
+        System.getProperty("user.home") + File.separator + 
+        "Documents" + File.separator + "demineur" + File.separator + "scoreboard";
 
     /**
      * Récupère le tableau depuis le fichier concernant une difficulté donnée.
@@ -26,7 +31,7 @@ public class TableauxScores {
     public static HashMap<Integer, Partie> getTableau(Difficulte difficulte) throws IOException{
         HashMap<Integer, Partie> tab = new HashMap<Integer, Partie>();
         if(!creerFichierTableau(difficulte)){
-            File tabFile = new File(CHEMIN_TABLEAU+"\\"+difficulte.getNom().toLowerCase()+".sb");
+            File tabFile = new File(CHEMIN_TABLEAU+File.separator+difficulte.getNom().toLowerCase()+".sb");
             FileInputStream fis = new FileInputStream(tabFile);
             ObjectInputStream ois = new ObjectInputStream(fis);
             try {
@@ -44,22 +49,29 @@ public class TableauxScores {
      * Ajoute le nouveau score au tableau si dans les 10 premiers
      * Si pas encore de score sur ce tableau, ajoute automatiquement
      * à la première place
-     * @param p
+     * @param p partie à ajouter au tableau
      * @throws IOException 
      */
     public static void addToTableau(Partie p) throws IOException{
+        File tabFile = new File(CHEMIN_TABLEAU+File.separator+p.getDifficulte().getNom().toLowerCase()+".sb");
         HashMap<Integer, Partie> tab = getTableau(p.getDifficulte());
         boolean placee = false;
-        for(Partie val : tab.values()){
-            if(val == null){
-                val = p;
+        for(Integer key : tab.keySet()){
+            if(tab.get(key) == null){
+                tab.put(key, p);
                 placee = true;
+                break;
             }
         }
 
         if(!placee){
             // TODO
         }
+
+        FileOutputStream fos = new FileOutputStream(tabFile);
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+        oos.writeObject(tab);
+        oos.close();
     }
 
     /**
@@ -71,7 +83,7 @@ public class TableauxScores {
      * @throws IOException 
      */
     private static boolean creerFichierTableau(Difficulte difficulte) throws IOException{
-        File tableau = new File(CHEMIN_TABLEAU+"\\"+difficulte.getNom().toLowerCase()+".sb");
+        File tableau = new File(CHEMIN_TABLEAU+File.separator+difficulte.getNom().toLowerCase()+".sb");
         if(!tableau.exists()){
             HashMap<Integer, Partie> tab = new HashMap<Integer, Partie>();
             for(int i = 1; i <= 10; i++){
@@ -108,7 +120,7 @@ public class TableauxScores {
      */
     private static void recreerFichierTableau(Difficulte difficulte) throws IOException{
         //Supression d'un fichier à partir de son nom
-        File fichier = new File(CHEMIN_TABLEAU+"\\"+difficulte.getNom().toLowerCase()+".sb");
+        File fichier = new File(CHEMIN_TABLEAU+File.separator+difficulte.getNom().toLowerCase()+".sb");
         fichier.delete();
         creerFichierTableau(difficulte);
     }

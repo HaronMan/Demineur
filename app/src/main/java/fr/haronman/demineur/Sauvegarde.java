@@ -18,7 +18,9 @@ import java.util.Optional;
  */
 public class Sauvegarde implements Serializable{
     // Chemin du dossier de sauvegardes 
-    public static final String CHEMIN_SAUVEGARDE = "C:\\Users\\hkoch\\Documents\\demineur\\saves";
+    public static final String CHEMIN_SAUVEGARDE = 
+        System.getProperty("user.home") + File.separator + 
+        "Documents" + File.separator + "demineur" + File.separator + "saves";
 
     /**
      * Effectue une sauvegarde de la partie donnée
@@ -34,7 +36,7 @@ public class Sauvegarde implements Serializable{
         // Si le dossier de sauvegarde n'existe pas
 
         String nomFichier = partie.getNomSave()+".save";
-        File fichier = new File(Sauvegarde.CHEMIN_SAUVEGARDE+"\\"+nomFichier);
+        File fichier = new File(Sauvegarde.CHEMIN_SAUVEGARDE+File.separator+nomFichier);
         if(!fichier.exists()){
             fichier.createNewFile();
         }

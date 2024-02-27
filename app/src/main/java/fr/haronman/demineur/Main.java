@@ -3,7 +3,6 @@ package fr.haronman.demineur;
 import fr.haronman.demineur.fx.JeuFX;
 import fr.haronman.demineur.model.Difficulte;
 import fr.haronman.demineur.model.Jeu;
-import fr.haronman.demineur.model.TableauxScores;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
